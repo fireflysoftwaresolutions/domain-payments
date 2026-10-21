@@ -110,6 +110,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MovementResult"
+  /api/v1/payment-records/standing-orders:
+    post:
+      tags:
+      - Payment Records
+      operationId: runStandingOrder
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StandingOrderBody"
+      responses:
+        "200":
+          description: Standing order run recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecordedId"
+  /api/v1/payment-records/direct-debits:
+    post:
+      tags:
+      - Payment Records
+      operationId: createDirectDebit
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectDebitBody"
+      responses:
+        "200":
+          description: Direct debit mandate recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecordedId"
+  /api/v1/payment-records/standing-orders/{runId}:
+    get:
+      tags:
+      - Payment Records
+      operationId: readStandingOrder
+      parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Standing order run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandingOrderView"
+  /api/v1/payment-records/direct-debits/{mandateId}:
+    get:
+      tags:
+      - Payment Records
+      operationId: readDirectDebit
+      parameters:
+      - name: mandateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Direct debit mandate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DirectDebitView"
 components:
   schemas:
     MovementCommand:
@@ -230,4 +316,74 @@ components:
         amount:
           type: number
         currency:
+          type: string
+    StandingOrderBody:
+      type: object
+      properties:
+        paymentScheduleId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        valueDate:
+          type: string
+          format: date
+    DirectDebitBody:
+      type: object
+      properties:
+        debtorAccountId:
+          type: string
+          format: uuid
+        creditorPartyId:
+          type: string
+          format: uuid
+        amountLimit:
+          type: number
+        currency:
+          type: string
+        reference:
+          type: string
+    RecordedId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    StandingOrderView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        paymentScheduleId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        valueDate:
+          type: string
+          format: date
+    DirectDebitView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        debtorAccountId:
+          type: string
+          format: uuid
+        creditorPartyId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        amountLimit:
+          type: number
+        currency:
+          type: string
+        reference:
           type: string
