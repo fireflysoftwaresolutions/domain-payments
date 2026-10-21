@@ -16,32 +16,45 @@
 
 package io.fireflysoftware.domain.payments.infra;
 
+import io.fireflysoftware.core.banking.accounts.sdk.api.AccountBalancesApi;
+import io.fireflysoftware.core.banking.accounts.sdk.api.AccountSpacesApi;
+import io.fireflysoftware.core.banking.accounts.sdk.invoker.ApiClient;
+import io.fireflysoftware.core.banking.accounts.sdk.model.AccountBalanceDTO;
 import io.fireflysoftware.domain.payments.PaymentFailure;
 import io.fireflysoftware.domain.payments.PaymentFlowException;
 import io.fireflysoftware.domain.payments.PositionKind;
 import io.fireflysoftware.domain.payments.PositionMovement;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Updates the customer position in core-banking-accounts.
- * Space movement calls {@code POST /api/v1/account-spaces/transfer}.
+ * Updates the customer position through {@code core-banking-accounts-sdk}.
+ * Space movement calls {@code AccountSpacesApi#transferBetweenSpaces}.
+ * Selected when {@code firefly.payments.mode=live}. The sandbox adapter stays the default.
  */
-public final class HttpAccountPositionAdapter implements AccountPositionPort {
+public final class SdkAccountPositionAdapter implements AccountPositionPort {
 
-    private final String baseUrl;
-    private final HttpClient client = HttpClient.newHttpClient();
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
+
+    private final AccountBalancesApi balances;
+    private final AccountSpacesApi spaces;
     private final java.util.concurrent.ConcurrentHashMap<String, PositionMovement> applied = new java.util.concurrent.ConcurrentHashMap<>();
 
-    public HttpAccountPositionAdapter(String baseUrl) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    public SdkAccountPositionAdapter(String baseUrl) {
+        ApiClient client = new ApiClient();
+        client.setBasePath(strip(baseUrl));
+        this(new AccountBalancesApi(client), new AccountSpacesApi(client));
+    }
+
+    SdkAccountPositionAdapter(AccountBalancesApi balances, AccountSpacesApi spaces) {
+        this.balances = balances;
+        this.spaces = spaces;
     }
 
     @Override
@@ -50,10 +63,7 @@ public final class HttpAccountPositionAdapter implements AccountPositionPort {
             return;
         }
         if (movement.kind() == PositionKind.SPACE_TRANSFER) {
-            String path = "/api/v1/account-spaces/transfer?fromSpaceId=" + movement.fromSpaceId()
-                    + "&toSpaceId=" + movement.toSpaceId()
-                    + "&amount=" + movement.amount().toPlainString();
-            exchange(HttpRequest.newBuilder(URI.create(baseUrl + path)).POST(HttpRequest.BodyPublishers.noBody()).build());
+            transfer(movement.fromSpaceId(), movement.toSpaceId(), movement.amount(), movement.idempotencyKey());
             return;
         }
         if (movement.kind() == PositionKind.ACCOUNT_TRANSFER) {
@@ -86,35 +96,44 @@ public final class HttpAccountPositionAdapter implements AccountPositionPort {
         } else if (original.kind() == PositionKind.CUSTOMER_CREDIT) {
             postBalance(original.toAccountId(), opposite, reversalKey);
         } else {
-            String path = "/api/v1/account-spaces/transfer?fromSpaceId=" + original.toSpaceId()
-                    + "&toSpaceId=" + original.fromSpaceId()
-                    + "&amount=" + original.amount().toPlainString();
-            exchange(HttpRequest.newBuilder(URI.create(baseUrl + path)).POST(HttpRequest.BodyPublishers.noBody()).build());
+            transfer(original.toSpaceId(), original.fromSpaceId(), original.amount(), reversalKey);
         }
         applied.put(reversalKey, original);
     }
 
-    private void postBalance(UUID accountId, BigDecimal amount, String key) {
-        String body = "{\"accountId\":\"" + accountId + "\",\"balanceType\":\"AVAILABLE\",\"balanceAmount\":"
-                + amount.toPlainString() + ",\"asOfDatetime\":\"" + LocalDateTime.now().withNano(0) + "\"}";
-        exchange(HttpRequest.newBuilder(URI.create(baseUrl + "/api/v1/accounts/" + accountId + "/balances"))
-                .header("Content-Type", "application/json")
-                .header("Idempotency-Key", key)
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build());
+    private void transfer(UUID fromSpaceId, UUID toSpaceId, BigDecimal amount, String key) {
+        Boolean moved = call(spaces.transferBetweenSpaces(fromSpaceId, toSpaceId, amount, key));
+        if (Boolean.FALSE.equals(moved)) {
+            throw new PaymentFlowException(PaymentFailure.POSITION_FAILED, "Accounts refused the space transfer.");
+        }
     }
 
-    private void exchange(HttpRequest request) {
+    private void postBalance(UUID accountId, BigDecimal amount, String key) {
+        AccountBalanceDTO body = new AccountBalanceDTO()
+                .accountId(accountId)
+                .balanceType(AccountBalanceDTO.BalanceTypeEnum.AVAILABLE)
+                .balanceAmount(amount)
+                .asOfDatetime(LocalDateTime.now().withNano(0));
+        call(balances.createBalance(accountId, body, key));
+    }
+
+    private static <T> T call(Mono<T> call) {
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 400) {
-                throw new PaymentFlowException(PaymentFailure.POSITION_FAILED,
-                        "Accounts returned HTTP " + response.statusCode() + ".");
-            }
+            return call.block(TIMEOUT);
+        } catch (WebClientResponseException ex) {
+            throw new PaymentFlowException(PaymentFailure.POSITION_FAILED,
+                    "Accounts returned HTTP " + ex.getStatusCode().value() + ".");
         } catch (PaymentFlowException ex) {
             throw ex;
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             throw new PaymentFlowException(PaymentFailure.POSITION_FAILED, "The accounts call failed: " + ex.getMessage());
         }
+    }
+
+    private static String strip(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new PaymentFlowException(PaymentFailure.POSITION_FAILED, "Accounts base URL is required.");
+        }
+        return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
     }
 }

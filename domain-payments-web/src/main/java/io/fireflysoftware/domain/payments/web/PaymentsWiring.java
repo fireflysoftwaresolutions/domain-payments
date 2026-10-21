@@ -16,10 +16,10 @@
 
 package io.fireflysoftware.domain.payments.web;
 
-import io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter;
-import io.fireflysoftware.domain.common.sca.challenge.SandboxCoreScaClient;
-import io.fireflysoftware.domain.common.sca.challenge.ScaChallengeService;
-import io.fireflysoftware.domain.common.sca.challenge.SdkCoreScaClient;
+import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
+import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
+import io.fireflysoftware.domain.payments.sca.SdkCoreScaClient;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
 import io.fireflysoftware.domain.payments.core.ports.LedgerPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentConfigurationPort;
@@ -35,11 +35,11 @@ import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapt
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
-import io.fireflysoftware.domain.payments.infra.HttpAccountPositionAdapter;
+import io.fireflysoftware.domain.payments.infra.SdkAccountPositionAdapter;
 import io.fireflysoftware.domain.payments.infra.SdkLedgerAdapter;
-import io.fireflysoftware.domain.payments.infra.HttpPaymentConfigurationAdapter;
-import io.fireflysoftware.domain.payments.infra.HttpPaymentMasterAdapter;
-import io.fireflysoftware.domain.payments.infra.HttpPaymentRecordAdapter;
+import io.fireflysoftware.domain.payments.infra.SdkPaymentConfigurationAdapter;
+import io.fireflysoftware.domain.payments.infra.SdkPaymentMasterAdapter;
+import io.fireflysoftware.domain.payments.infra.SdkPaymentRecordAdapter;
 import io.fireflysoftware.domain.payments.infra.LibraryPaymentRailAdapter;
 import io.fireflysoftware.domain.payments.infra.LibraryPspAdapter;
 import io.fireflysoftware.psps.adapter.ports.PaymentPort;
@@ -127,13 +127,13 @@ public class PaymentsWiring {
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "live")
     AccountPositionPort liveAccounts(@Value("${firefly.payments.accounts-base-url}") String baseUrl) {
-        return new HttpAccountPositionAdapter(baseUrl);
+        return new SdkAccountPositionAdapter(baseUrl);
     }
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "live")
     PaymentRecordPort liveRecords(@Value("${firefly.payments.payments-core-base-url}") String baseUrl) {
-        return new HttpPaymentRecordAdapter(baseUrl);
+        return new SdkPaymentRecordAdapter(baseUrl);
     }
 
     @Bean
@@ -151,12 +151,12 @@ public class PaymentsWiring {
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.configuration", havingValue = "live")
     PaymentConfigurationPort liveConfiguration(@Value("${firefly.payments.config-base-url}") String baseUrl) {
-        return new HttpPaymentConfigurationAdapter(baseUrl);
+        return new SdkPaymentConfigurationAdapter(baseUrl);
     }
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.configuration", havingValue = "live")
     PaymentMasterPort liveMasters(@Value("${firefly.payments.masters-base-url}") String baseUrl) {
-        return new HttpPaymentMasterAdapter(baseUrl);
+        return new SdkPaymentMasterAdapter(baseUrl);
     }
 }

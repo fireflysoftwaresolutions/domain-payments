@@ -34,6 +34,26 @@
             <version>26.10.3</version>
         </dependency>
         <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>core-banking-accounts-sdk</artifactId>
+            <version>26.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>core-banking-payments-sdk</artifactId>
+            <version>26.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>core-common-config-mgmt-sdk</artifactId>
+            <version>26.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fireflysoftware</groupId>
+            <artifactId>core-common-reference-master-data-sdk</artifactId>
+            <version>26.10.3</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-json</artifactId>
         </dependency>

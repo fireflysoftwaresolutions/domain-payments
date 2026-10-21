@@ -16,13 +16,6 @@
 
 package io.fireflysoftware.domain.payments.core.tcc;
 
-import io.fireflysoftware.domain.common.sca.challenge.ChallengeStatus;
-import io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter;
-import io.fireflysoftware.domain.common.sca.challenge.SandboxCoreScaClient;
-import io.fireflysoftware.domain.common.sca.challenge.ScaChallengeService;
-import io.fireflysoftware.domain.configuration.parameters.BusinessParameter;
-import io.fireflysoftware.domain.configuration.parameters.BusinessParameterPort;
-import io.fireflysoftware.domain.configuration.parameters.SandboxBusinessParameterAdapter;
 import io.fireflysoftware.domain.payments.EntrySide;
 import io.fireflysoftware.domain.payments.LedgerLeg;
 import io.fireflysoftware.domain.payments.LedgerPosting;
@@ -38,6 +31,10 @@ import io.fireflysoftware.domain.payments.PaymentStatus;
 import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
 import io.fireflysoftware.domain.payments.StoredPayment;
+import io.fireflysoftware.domain.payments.sca.ChallengeStatus;
+import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
+import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
 import io.fireflysoftware.domain.payments.SyncMessages.InboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.OutboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.SyncResult;
@@ -75,8 +72,6 @@ public final class PaymentTccHub {
     static final String TRY = "PaymentTry";
     static final String CONFIRM = "PaymentConfirm";
     static final String CANCEL = "PaymentCancel";
-    private static final String INTERNAL_SCA = "payments.sca.required.INTERNAL";
-
     private final LedgerPort ledger;
     private final PaymentRecordPort records;
     private final PaymentRailPort rail;
@@ -84,7 +79,6 @@ public final class PaymentTccHub {
     private final PaymentConfigurationPort configuration;
     private final PaymentMasterPort masters;
     private final SchemeRouter router;
-    private final BusinessParameterPort parameters;
     private final ScaChallengeService sca;
     private final TccEngine engine;
     private final TccDefinition tryTcc;
@@ -100,7 +94,6 @@ public final class PaymentTccHub {
                          PaymentConfigurationPort configuration,
                          PaymentMasterPort masters,
                          SchemeRouter router,
-                         BusinessParameterPort parameters,
                          ScaChallengeService sca) {
         this.ledger = ledger;
         this.records = records;
@@ -109,7 +102,6 @@ public final class PaymentTccHub {
         this.configuration = configuration;
         this.masters = masters;
         this.router = router;
-        this.parameters = parameters;
         this.sca = sca;
         OrchestrationEvents events = new OrchestrationEvents() { };
         NoOpEventPublisher publisher = new NoOpEventPublisher();
@@ -128,8 +120,7 @@ public final class PaymentTccHub {
                                        PaymentConfigurationPort configuration,
                                        PaymentMasterPort masters,
                                        ScaChallengeService sca) {
-        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(),
-                new SandboxBusinessParameterAdapter(), sca);
+        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(), sca);
     }
 
     public static PaymentTccHub sandbox(LedgerPort ledger,
@@ -330,8 +321,7 @@ public final class PaymentTccHub {
 
     private boolean scaRequired(SchemeRouting routing) {
         if (routing.route() == MovementRoute.INTERNAL_BOOK) {
-            BusinessParameter parameter = parameters.findByKey(INTERNAL_SCA).block();
-            return parameter != null && "true".equalsIgnoreCase(parameter.value());
+            return false;
         }
         return routing.route().outbound();
     }

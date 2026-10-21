@@ -18,6 +18,12 @@ package io.fireflysoftware.domain.payments.infra;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fireflysoftware.common.config.sdk.api.ChannelConfigParametersApi;
+import io.fireflysoftware.common.config.sdk.invoker.ApiClient;
+import io.fireflysoftware.common.config.sdk.model.ChannelConfigParameterDTO;
+import io.fireflysoftware.common.config.sdk.model.FilterRequestChannelConfigParameterDTO;
+import io.fireflysoftware.common.config.sdk.model.PaginationRequest;
+import io.fireflysoftware.common.config.sdk.model.PaginationResponse;
 import io.fireflysoftware.domain.payments.MovementRoute;
 import io.fireflysoftware.domain.payments.PaymentFailure;
 import io.fireflysoftware.domain.payments.PaymentFlowException;
@@ -29,12 +35,10 @@ import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
 import io.fireflysoftware.domain.payments.PspInstrument;
 import io.fireflysoftware.domain.payments.RailKind;
 import io.fireflysoftware.domain.payments.core.ports.PaymentConfigurationPort;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,60 +46,56 @@ import java.util.UUID;
 /**
  * Reads the payments catalog from core-common-config-mgmt channel parameter {@code payments.catalog}.
  */
-public final class HttpPaymentConfigurationAdapter implements PaymentConfigurationPort {
+public final class SdkPaymentConfigurationAdapter implements PaymentConfigurationPort {
 
     static final String PARAMETER_KEY = "payments.catalog";
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
-    private final String baseUrl;
-    private final HttpClient http;
+    private final ChannelConfigParametersApi parameters;
     private final ObjectMapper json = new ObjectMapper();
 
-    public HttpPaymentConfigurationAdapter(String baseUrl) {
-        this(baseUrl, HttpClient.newHttpClient());
+    public SdkPaymentConfigurationAdapter(String baseUrl) {
+        ApiClient client = new ApiClient();
+        client.setBasePath(strip(baseUrl));
+        this(new ChannelConfigParametersApi(client));
     }
 
-    HttpPaymentConfigurationAdapter(String baseUrl, HttpClient http) {
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        this.http = http;
+    SdkPaymentConfigurationAdapter(ChannelConfigParametersApi parameters) {
+        this.parameters = parameters;
     }
 
     @Override
     public PaymentsCatalog catalog() {
         try {
-            HttpResponse<String> response = http.send(HttpRequest.newBuilder(URI.create(baseUrl + "/api/v1/channel-config-parameters/filter"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString("{\"page\":0,\"size\":200}"))
-                    .build(), HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 400) {
-                throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Configuration service rejected the catalog read.");
+            ChannelConfigParameterDTO filter = new ChannelConfigParameterDTO().parameterKey(PARAMETER_KEY);
+            FilterRequestChannelConfigParameterDTO request = new FilterRequestChannelConfigParameterDTO()
+                    .filters(filter)
+                    .pagination(new PaginationRequest().pageNumber(0).pageSize(200));
+            PaginationResponse response = parameters.filter(request, null).block(TIMEOUT);
+            if (response == null || response.getContent() == null) {
+                throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Configuration catalog is missing.");
             }
-            JsonNode root = json.readTree(response.body());
-            String raw = findParameter(root);
+            String raw = null;
+            for (Object item : response.getContent()) {
+                ChannelConfigParameterDTO row = json.convertValue(item, ChannelConfigParameterDTO.class);
+                if (row != null && PARAMETER_KEY.equals(row.getParameterKey())) {
+                    raw = row.getParameterValue();
+                    break;
+                }
+            }
+            if (raw == null || raw.isBlank()) {
+                throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
+                        "Channel parameter payments.catalog was not found.");
+            }
             return parse(json.readTree(raw));
         } catch (PaymentFlowException ex) {
             throw ex;
+        } catch (WebClientResponseException ex) {
+            throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
+                    "Configuration service rejected the catalog read.");
         } catch (Exception ex) {
             throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Configuration catalog could not be read.");
         }
-    }
-
-    private String findParameter(JsonNode node) {
-        if (node == null) {
-            throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Configuration catalog is missing.");
-        }
-        if (node.isObject() && PARAMETER_KEY.equals(node.path("parameterKey").asText())) {
-            return node.path("parameterValue").asText();
-        }
-        if (node.isContainerNode()) {
-            for (JsonNode child : node) {
-                try {
-                    return findParameter(child);
-                } catch (PaymentFlowException ignored) {
-                    // keep searching the document
-                }
-            }
-        }
-        throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Channel parameter payments.catalog was not found.");
     }
 
     private PaymentsCatalog parse(JsonNode catalog) {
@@ -127,5 +127,12 @@ public final class HttpPaymentConfigurationAdapter implements PaymentConfigurati
                 UUID.fromString(clearing.path("inboundClearingAccountId").asText()),
                 UUID.fromString(clearing.path("suspenseAccountId").asText()),
                 UUID.fromString(clearing.path("nostroAccountId").asText())));
+    }
+
+    private static String strip(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Configuration base URL is required.");
+        }
+        return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
     }
 }
