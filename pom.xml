@@ -7,13 +7,13 @@
     <parent>
         <groupId>io.fireflysoftware</groupId>
         <artifactId>firefly-parent</artifactId>
-        <version>26.10.3</version>
+        <version>26.10.4</version>
         <relativePath/>
     </parent>
 
     <artifactId>domain-payments</artifactId>
     <name>domain-payments</name>
-    <version>26.10.3</version>
+    <version>26.10.4</version>
     <packaging>pom</packaging>
     <description>Payments domain hub. Orchestrates customer position, the ledger, and third-party sync.</description>
 
@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>io.fireflysoftware</groupId>
                 <artifactId>firefly-bom</artifactId>
-                <version>26.10.3</version>
+                <version>26.10.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

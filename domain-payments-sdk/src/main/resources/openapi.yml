@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: domain-payments
-  version: 26.10.3
+  version: 26.10.4
 servers:
 - url: http://localhost:8092
 tags:

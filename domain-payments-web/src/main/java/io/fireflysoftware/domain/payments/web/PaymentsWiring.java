@@ -17,7 +17,6 @@
 package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
-import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
 import io.fireflysoftware.domain.payments.sca.SdkCoreScaClient;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
@@ -66,8 +65,8 @@ public class PaymentsWiring {
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "sandbox", matchIfMissing = true)
-    ScaChallengeService sandboxSca() {
-        return new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter());
+    ScaChallengeService sandboxSca(@Value("${firefly.payments.sca-base-url}") String baseUrl) {
+        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), new SandboxChallengeDeliveryAdapter());
     }
 
     @Bean

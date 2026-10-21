@@ -67,7 +67,7 @@ public final class SdkCoreScaClient implements CoreScaClient {
                 .scaOperationId(operation.getId())
                 .challengeCode(offered)
                 .expiresAt(LocalDateTime.now().plusMinutes(5).withNano(0))
-                .used(false), paymentId.toString()));
+                .used(false), paymentId + ":challenge"));
         String code = challenge.getChallengeCode();
         if (challenge.getId() == null || code == null || code.isBlank() || "sandbox".equals(code)) {
             throw new IllegalStateException("core-common-sca-mgmt did not return a challenge code.");
@@ -78,7 +78,7 @@ public final class SdkCoreScaClient implements CoreScaClient {
     @Override
     public boolean validate(UUID operationId, UUID challengeId, String response) {
         try {
-            String body = challenges.validateChallenge(operationId, challengeId, response, operationId.toString())
+            String body = challenges.validateChallenge(operationId, challengeId, response, operationId + ":validate")
                     .block(TIMEOUT);
             return body != null;
         } catch (RuntimeException ex) {
@@ -92,7 +92,7 @@ public final class SdkCoreScaClient implements CoreScaClient {
     @Override
     public void expire(UUID operationId, UUID challengeId) {
         try {
-            challenges.deleteChallenge(operationId, challengeId, operationId.toString()).block(TIMEOUT);
+            challenges.deleteChallenge(operationId, challengeId, operationId + ":expire").block(TIMEOUT);
         } catch (RuntimeException ex) {
             WebClientResponseException http = http(ex);
             if (http != null && http.getStatusCode().value() == 404) {
