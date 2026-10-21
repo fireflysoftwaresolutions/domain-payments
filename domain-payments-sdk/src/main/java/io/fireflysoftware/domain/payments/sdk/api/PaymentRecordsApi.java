@@ -62,6 +62,14 @@ public class PaymentRecordsApi {
         return post("/api/v1/payment-records/direct-debits", body, key);
     }
 
+    public Mono<StandingOrderView> standingOrder(UUID runId) {
+        return get("/api/v1/payment-records/standing-orders/" + runId, StandingOrderView.class);
+    }
+
+    public Mono<DirectDebitView> directDebit(UUID mandateId) {
+        return get("/api/v1/payment-records/direct-debits/" + mandateId, DirectDebitView.class);
+    }
+
     private Mono<UUID> post(String path, Map<String, Object> body, String key) {
         return webClient.post()
                 .uri(basePath + path)
@@ -73,6 +81,21 @@ public class PaymentRecordsApi {
                 .map(RecordedId::id);
     }
 
+    private <T> Mono<T> get(String path, Class<T> type) {
+        return webClient.get()
+                .uri(basePath + path)
+                .retrieve()
+                .bodyToMono(type);
+    }
+
     public record RecordedId(UUID id) {
+    }
+
+    public record StandingOrderView(UUID id, UUID paymentScheduleId, BigDecimal amount, String currency,
+                                     LocalDate valueDate) {
+    }
+
+    public record DirectDebitView(UUID id, UUID debtorAccountId, UUID creditorPartyId, String status,
+                                   BigDecimal amountLimit, String currency, String reference) {
     }
 }

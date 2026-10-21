@@ -16,7 +16,11 @@
 
 package io.fireflysoftware.domain.payments.web;
 
+import io.fireflysoftware.core.banking.payments.sdk.model.DirectDebitMandateDTO;
+import io.fireflysoftware.core.banking.payments.sdk.model.StandingOrderRunDTO;
 import io.fireflysoftware.domain.payments.infra.PaymentInstructionRecords;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,6 +54,27 @@ public class PaymentRecordsController {
                 .map(RecordedId::new);
     }
 
+    @GetMapping("/standing-orders/{runId}")
+    public Mono<StandingOrderView> standingOrder(@PathVariable UUID runId) {
+        return records.standingOrder(runId).map(PaymentRecordsController::standingOrderView);
+    }
+
+    @GetMapping("/direct-debits/{mandateId}")
+    public Mono<DirectDebitView> directDebit(@PathVariable UUID mandateId) {
+        return records.directDebit(mandateId).map(PaymentRecordsController::directDebitView);
+    }
+
+    private static StandingOrderView standingOrderView(StandingOrderRunDTO row) {
+        return new StandingOrderView(row.getStandingOrderRunId(), row.getPaymentScheduleId(), row.getAmount(),
+                row.getCurrency(), row.getValueDate());
+    }
+
+    private static DirectDebitView directDebitView(DirectDebitMandateDTO row) {
+        return new DirectDebitView(row.getDirectDebitMandateId(), row.getDebtorAccountId(), row.getCreditorPartyId(),
+                row.getStatus() == null ? null : row.getStatus().getValue(),
+                row.getAmountLimit(), row.getCurrency(), row.getReference());
+    }
+
     public record StandingOrderBody(UUID paymentScheduleId, BigDecimal amount, String currency, LocalDate valueDate) {
     }
 
@@ -58,5 +83,13 @@ public class PaymentRecordsController {
     }
 
     public record RecordedId(UUID id) {
+    }
+
+    public record StandingOrderView(UUID id, UUID paymentScheduleId, BigDecimal amount, String currency,
+                                     LocalDate valueDate) {
+    }
+
+    public record DirectDebitView(UUID id, UUID debtorAccountId, UUID creditorPartyId, String status,
+                                   BigDecimal amountLimit, String currency, String reference) {
     }
 }
