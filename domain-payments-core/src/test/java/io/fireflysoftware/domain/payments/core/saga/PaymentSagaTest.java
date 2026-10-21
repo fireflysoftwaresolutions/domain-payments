@@ -144,6 +144,8 @@ class PaymentSagaTest {
         assertEquals(RailKind.SWIFT, SandboxCatalog.standard().routes().stream()
                 .filter(route -> route.scheme() == PaymentScheme.INTERNATIONAL_OUTBOUND)
                 .findFirst().orElseThrow().railKind());
+        assertEquals(SandboxCatalog.clearing().outboundClearingAccountId(), result.posting().legs().get(1).accountId());
+        assertEquals(SandboxCatalog.clearing().nostroAccountId(), result.nostroAccountId());
         assertEquals(1, rail.outboundCalls());
         assertEquals(0, psp.outboundCalls());
         assertTrue(result.thirdPartySynced());
@@ -180,7 +182,7 @@ class PaymentSagaTest {
     @Test
     void inboundCreditsTheCustomerFromClearingOncePerReference() {
         UUID inboundClearing = UUID.fromString("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2");
-        saga = sagaWith(new SandboxPaymentConfigurationAdapter(catalogWithClearing(SandboxCatalog.OUTBOUND_CLEARING, inboundClearing, SandboxCatalog.SUSPENSE, SandboxCatalog.NOSTRO)),
+        saga = sagaWith(new SandboxPaymentConfigurationAdapter(catalogWithClearing(SandboxCatalog.clearing().outboundClearingAccountId(), inboundClearing, null, SandboxCatalog.clearing().nostroAccountId())),
                 new SandboxPaymentMasterAdapter());
 
         MovementResult result = saga.execute(inbound("BANK-REF-1"));
@@ -203,7 +205,7 @@ class PaymentSagaTest {
         MovementResult result = saga.execute(inbound("BANK-REF-2"));
 
         assertEquals(PaymentStatus.UNMATCHED, result.status());
-        assertEquals(SandboxCatalog.SUSPENSE, result.suspenseAccountId());
+        assertNull(result.suspenseAccountId());
         assertNotNull(result.reversal());
         assertEquals(0, rail.returnCalls());
         assertEquals(2, ledger.postings().size());
@@ -248,7 +250,7 @@ class PaymentSagaTest {
 
         assertEquals(MovementRoute.OUTBOUND_RAIL, result.route());
         assertEquals(1, rail.outboundCalls());
-        assertEquals(SandboxCatalog.OUTBOUND_CLEARING, result.posting().legs().get(1).accountId());
+        assertEquals(SandboxCatalog.clearing().outboundClearingAccountId(), result.posting().legs().get(1).accountId());
     }
 
     @Test
@@ -269,7 +271,7 @@ class PaymentSagaTest {
         assertEquals(MovementRoute.OUTBOUND_PSP, result.route());
         assertEquals(1, psp.outboundCalls());
         assertEquals(0, rail.outboundCalls());
-        assertBalanced(result.posting(), SOURCE, SandboxCatalog.OUTBOUND_CLEARING, "EUR");
+        assertBalanced(result.posting(), SOURCE, SandboxCatalog.clearing().outboundClearingAccountId(), "EUR");
     }
 
     private PaymentSaga sagaWith(SandboxPaymentConfigurationAdapter configuration, SandboxPaymentMasterAdapter master) {
@@ -287,7 +289,7 @@ class PaymentSagaTest {
     }
 
     private PaymentsCatalog catalogWithClearing(UUID outbound, UUID nostro) {
-        return catalogWithClearing(outbound, SandboxCatalog.INBOUND_CLEARING, SandboxCatalog.SUSPENSE, nostro);
+        return catalogWithClearing(outbound, SandboxCatalog.clearing().inboundClearingAccountId(), null, nostro);
     }
 
     private PaymentsCatalog catalogWithClearing(UUID outbound, UUID inbound, UUID suspense, UUID nostro) {

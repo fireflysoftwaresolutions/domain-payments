@@ -16,8 +16,14 @@
 
 package io.fireflysoftware.domain.payments.core.sandbox;
 
+import io.fireflysoftware.domain.configuration.parameters.BusinessParameter;
+import io.fireflysoftware.domain.configuration.parameters.BusinessParameterPort;
+import io.fireflysoftware.domain.configuration.parameters.SandboxBusinessParameterAdapter;
+import io.fireflysoftware.domain.configuration.parameters.TransferRoute;
 import io.fireflysoftware.domain.payments.MasterData;
 import io.fireflysoftware.domain.payments.MovementRoute;
+import io.fireflysoftware.domain.payments.PaymentFailure;
+import io.fireflysoftware.domain.payments.PaymentFlowException;
 import io.fireflysoftware.domain.payments.PaymentScheme;
 import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.ClearingAccounts;
@@ -25,64 +31,138 @@ import io.fireflysoftware.domain.payments.PaymentsCatalog.CurrencyPair;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
 import io.fireflysoftware.domain.payments.PspInstrument;
 import io.fireflysoftware.domain.payments.RailKind;
+import io.fireflysoftware.domain.referencedata.catalog.CatalogCode;
+import io.fireflysoftware.domain.referencedata.catalog.CatalogEntry;
+import io.fireflysoftware.domain.referencedata.catalog.ExecutionChannel;
+import io.fireflysoftware.domain.referencedata.catalog.ReferenceCatalogPort;
+import io.fireflysoftware.domain.referencedata.catalog.SandboxReferenceCatalogAdapter;
+import io.fireflysoftware.domain.referencedata.catalog.TransferTypeCode;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Deterministic sandbox catalog. These values live here, not in the saga.
- * Account-space type names match core-banking-accounts {@code AccountSpaceTypeEnum}.
+ * Builds the sandbox payments catalog by calling {@link BusinessParameterPort} and {@link ReferenceCatalogPort}.
+ * Account identifiers and transfer routes are not copied here.
  */
 public final class SandboxCatalog {
-
-    public static final UUID OUTBOUND_CLEARING = UUID.fromString("00000000-0000-4000-8000-0000000000c1");
-    public static final UUID INBOUND_CLEARING = UUID.fromString("00000000-0000-4000-8000-0000000000c2");
-    public static final UUID SUSPENSE = UUID.fromString("00000000-0000-4000-8000-0000000000c3");
-    public static final UUID NOSTRO = UUID.fromString("00000000-0000-4000-8000-0000000000c4");
-
-    private static final BigDecimal LIMIT = new BigDecimal("1000000.00");
 
     private SandboxCatalog() {
     }
 
     public static PaymentsCatalog standard() {
-        return new PaymentsCatalog(routes(), pairs(), spaceTypes(), clearing());
+        return from(new SandboxBusinessParameterAdapter(), new SandboxReferenceCatalogAdapter());
     }
 
     public static MasterData masters() {
-        return new MasterData(List.of("EUR", "USD", "GBP"));
+        return masters(new SandboxReferenceCatalogAdapter());
     }
 
     public static ClearingAccounts clearing() {
-        return new ClearingAccounts(OUTBOUND_CLEARING, INBOUND_CLEARING, SUSPENSE, NOSTRO);
+        return standard().clearingAccounts();
     }
 
-    public static List<String> spaceTypes() {
-        return List.of("MAIN", "SAVINGS", "VACATION", "EMERGENCY", "GOALS", "CUSTOM");
+    public static PaymentsCatalog from(BusinessParameterPort parameters, ReferenceCatalogPort catalogs) {
+        UUID outbound = account(parameters, "payments.clearing.outbound.account-id");
+        UUID inbound = account(parameters, "payments.clearing.inbound.account-id");
+        UUID nostro = account(parameters, "payments.nostro.account-id");
+        List<CatalogEntry> transferTypes = catalogs.list(CatalogCode.TRANSFER_TYPE).collectList().block();
+        List<String> currencies = catalogs.list(CatalogCode.CURRENCY).map(CatalogEntry::code).collectList().block();
+        List<String> spaceTypes = catalogs.list(CatalogCode.ACCOUNT_SPACE_TYPE).map(CatalogEntry::code).collectList().block();
+        boolean domesticSepa = catalogs.find(CatalogCode.RAIL_SCHEME, "SEPA_CREDIT_TRANSFER").blockOptional().isPresent();
+        List<SchemeRouting> routes = new ArrayList<>();
+        if (transferTypes != null) {
+            for (CatalogEntry entry : transferTypes) {
+                routes.addAll(routesFor(parameters, entry, domesticSepa));
+            }
+        }
+        routes.add(routing(PaymentScheme.PSP_PAYOUT,
+                movement(parameters, "payments.transfer-route.OUTBOUND_PSP"),
+                null, PspInstrument.PAYOUT, false));
+        routes.add(routing(PaymentScheme.PSP_INBOUND,
+                movement(parameters, "payments.transfer-route.INBOUND_PSP"),
+                null, PspInstrument.CARD, false));
+        List<CurrencyPair> pairs = new ArrayList<>();
+        if (currencies != null) {
+            for (String currency : currencies) {
+                pairs.add(new CurrencyPair(currency, currency));
+            }
+        }
+        return new PaymentsCatalog(List.copyOf(routes), List.copyOf(pairs),
+                spaceTypes == null ? List.of() : List.copyOf(spaceTypes),
+                new ClearingAccounts(outbound, inbound, null, nostro));
     }
 
-    private static List<CurrencyPair> pairs() {
-        return List.of(
-                new CurrencyPair("EUR", "EUR"),
-                new CurrencyPair("USD", "USD"),
-                new CurrencyPair("GBP", "GBP"),
-                new CurrencyPair("EUR", "USD"));
+    public static MasterData masters(ReferenceCatalogPort catalogs) {
+        List<String> currencies = catalogs.list(CatalogCode.CURRENCY).map(CatalogEntry::code).collectList().block();
+        return new MasterData(currencies == null ? List.of() : List.copyOf(currencies));
     }
 
-    private static List<SchemeRouting> routes() {
-        return List.of(
-                route(PaymentScheme.INTERNAL_TRANSFER, MovementRoute.INTERNAL_BOOK, null, null, false),
-                route(PaymentScheme.SPACE_TRANSFER, MovementRoute.INTERNAL_BOOK, null, null, true),
-                route(PaymentScheme.DOMESTIC_OUTBOUND, MovementRoute.OUTBOUND_RAIL, RailKind.SEPA, null, false),
-                route(PaymentScheme.INTERNATIONAL_OUTBOUND, MovementRoute.OUTBOUND_RAIL, RailKind.SWIFT, null, false),
-                route(PaymentScheme.PSP_PAYOUT, MovementRoute.OUTBOUND_PSP, null, PspInstrument.PAYOUT, false),
-                route(PaymentScheme.RAIL_INBOUND, MovementRoute.INBOUND_RAIL, RailKind.SEPA, null, false),
-                route(PaymentScheme.PSP_INBOUND, MovementRoute.INBOUND_PSP, null, PspInstrument.CARD, false));
+    private static List<SchemeRouting> routesFor(BusinessParameterPort parameters, CatalogEntry entry, boolean domesticSepa) {
+        ExecutionChannel channel = ExecutionChannel.valueOf(entry.attributes().get("executionChannel"));
+        TransferTypeCode type = TransferTypeCode.valueOf(entry.code());
+        RailKind rail = railFor(type, channel, domesticSepa);
+        PspInstrument instrument = channel == ExecutionChannel.LIBRARY_PSPS ? PspInstrument.CARD : null;
+        return switch (type) {
+            case INTERNAL -> List.of(
+                    routing(PaymentScheme.INTERNAL_TRANSFER,
+                            movement(parameters, "payments.transfer-type.INTERNAL.route"), null, null, false),
+                    routing(PaymentScheme.SPACE_TRANSFER,
+                            movement(parameters, "payments.transfer-type.INTERNAL.route"), null, null,
+                            Boolean.parseBoolean(entry.attributes().get("accountSpaceMovement"))));
+            case DOMESTIC -> List.of(
+                    routing(PaymentScheme.DOMESTIC_OUTBOUND,
+                            movement(parameters, "payments.transfer-type.DOMESTIC.outbound.route"), rail, instrument, false),
+                    routing(PaymentScheme.RAIL_INBOUND,
+                            movement(parameters, "payments.transfer-type.DOMESTIC.inbound.route"), rail, instrument, false));
+            case INTERNATIONAL -> {
+                MovementRoute outbound = movement(parameters, "payments.transfer-type.INTERNATIONAL.outbound.route");
+                MovementRoute inbound = movement(parameters, "payments.transfer-type.INTERNATIONAL.inbound.route");
+                if (channel == ExecutionChannel.LIBRARY_RAILS && (outbound == MovementRoute.OUTBOUND_PSP || inbound == MovementRoute.INBOUND_PSP)) {
+                    throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
+                            "An international credit transfer uses library-rails, not a PSP route.");
+                }
+                yield List.of(routing(PaymentScheme.INTERNATIONAL_OUTBOUND, outbound, rail, instrument, false));
+            }
+        };
     }
 
-    private static SchemeRouting route(PaymentScheme scheme, MovementRoute movement, RailKind rail,
-                                       PspInstrument instrument, boolean spaceMovement) {
-        return new SchemeRouting(scheme, movement, rail, instrument, spaceMovement, LIMIT);
+    private static RailKind railFor(TransferTypeCode type, ExecutionChannel channel, boolean domesticSepa) {
+        if (channel != ExecutionChannel.LIBRARY_RAILS) {
+            return null;
+        }
+        if (type == TransferTypeCode.INTERNATIONAL) {
+            return RailKind.SWIFT;
+        }
+        return domesticSepa ? RailKind.SEPA : null;
+    }
+
+    private static SchemeRouting routing(PaymentScheme scheme, MovementRoute route, RailKind rail,
+                                         PspInstrument instrument, boolean spaceMovement) {
+        return new SchemeRouting(scheme, route, rail, instrument, spaceMovement, null);
+    }
+
+    private static MovementRoute movement(BusinessParameterPort parameters, String key) {
+        return switch (TransferRoute.valueOf(required(parameters, key))) {
+            case INTERNAL -> MovementRoute.INTERNAL_BOOK;
+            case OUTBOUND_RAIL -> MovementRoute.OUTBOUND_RAIL;
+            case OUTBOUND_PSP -> MovementRoute.OUTBOUND_PSP;
+            case INBOUND_RAIL -> MovementRoute.INBOUND_RAIL;
+            case INBOUND_PSP -> MovementRoute.INBOUND_PSP;
+        };
+    }
+
+    private static UUID account(BusinessParameterPort parameters, String key) {
+        return UUID.fromString(required(parameters, key));
+    }
+
+    private static String required(BusinessParameterPort parameters, String key) {
+        BusinessParameter parameter = parameters.findByKey(key).block();
+        if (parameter == null || parameter.value() == null || parameter.value().isBlank()) {
+            throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
+                    "Business parameter " + key + " is not available.");
+        }
+        return parameter.value();
     }
 }
