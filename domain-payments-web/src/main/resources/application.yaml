@@ -1,0 +1,12 @@
+server:
+  port: ${SERVER_PORT:8092}
+
+firefly:
+  payments:
+    mode: sandbox
+    configuration: sandbox
+    ledger-base-url: ${LEDGER_URL:http://localhost:8083}
+    accounts-domain-base-url: ${ACCOUNTS_DOMAIN_URL:http://localhost:8090}
+    payments-core-base-url: ${PAYMENTS_CORE_URL:http://localhost:8084}
+    config-base-url: ${CONFIG_URL:http://localhost:8085}
+    masters-base-url: ${MASTERS_URL:http://localhost:8086}

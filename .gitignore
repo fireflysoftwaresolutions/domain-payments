@@ -1,0 +1,10 @@
+target/
+*.class
+*.log
+.idea/
+*.iml
+*.iws
+*.ipr
+.refactor-backup-*/
+*.refactor-backup-*
+.metadata-backup*
