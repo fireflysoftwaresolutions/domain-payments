@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.fireflysoftware</groupId>
         <artifactId>domain-payments</artifactId>
-        <version>26.10.4</version>
+        <version>26.10.5</version>
     </parent>
 
     <artifactId>domain-payments-infra</artifactId>
@@ -21,37 +21,37 @@
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>library-rails</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>library-psps</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>core-banking-ledger-sdk</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>core-banking-accounts-sdk</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>core-banking-payments-sdk</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>core-common-config-mgmt-sdk</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>core-common-reference-master-data-sdk</artifactId>
-            <version>26.10.4</version>
+            <version>26.10.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
