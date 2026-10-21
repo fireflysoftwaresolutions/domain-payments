@@ -61,9 +61,19 @@ public final class LibraryPspAdapter implements PspPort {
 
     @Override
     public SyncResult sendOutbound(OutboundInstruction instruction) {
+        if (instruction.instrument() == PspInstrument.CARD) {
+            PaymentResponse response = body(payments.createPayment(CreatePaymentRequest.builder()
+                    .amount(new Money(instruction.amount(), currency(instruction.currency())))
+                    .paymentMethodType(PaymentMethodType.CARD)
+                    .idempotencyKey(instruction.idempotencyKey())
+                    .captureImmediately(true)
+                    .description(instruction.idempotencyKey())
+                    .build()));
+            return mapPayment(response);
+        }
         if (instruction.instrument() != PspInstrument.PAYOUT) {
             throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
-                    "An outbound PSP movement uses the payout instrument.");
+                    "A credit transfer does not use the PSP. Card collection uses PaymentPort and a payout uses PayoutPort.");
         }
         String destination = instruction.creditorIban() == null
                 ? instruction.sourceAccountId().toString() : instruction.creditorIban();

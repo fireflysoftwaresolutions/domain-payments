@@ -23,7 +23,6 @@ import io.fireflysoftware.domain.payments.MovementRoute;
 import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
 import io.fireflysoftware.domain.payments.core.routing.SchemeRouter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxAccountPositionAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxCatalog;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
@@ -61,7 +60,7 @@ class PaymentTccHubTest {
     void setUp() {
         ledger = new SandboxLedgerAdapter();
         rail = new SandboxPaymentRailAdapter();
-        hub = PaymentTccHub.sandbox(ledger, new SandboxAccountPositionAdapter(), new SandboxPaymentRecordAdapter(),
+        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
                 rail, new SandboxPspAdapter(), new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
     }
 
@@ -132,7 +131,7 @@ class PaymentTccHubTest {
     @Test
     void internationalOutboundConfirmsOnTheRailNotThePsp() {
         SandboxPspAdapter psp = new SandboxPspAdapter();
-        hub = PaymentTccHub.sandbox(ledger, new SandboxAccountPositionAdapter(), new SandboxPaymentRecordAdapter(),
+        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
                 rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         MovementResult tried = hub.tryPayment(command(PaymentScheme.INTERNATIONAL_OUTBOUND, "swift-1", SOURCE, null));
         MovementResult confirmed = hub.confirm(tried.paymentId(), tried.challengeValue());

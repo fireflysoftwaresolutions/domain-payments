@@ -67,6 +67,9 @@ public final class HttpLedgerAdapter implements LedgerPort {
         if (response.statusCode() >= 400) {
             throw new PaymentFlowException(PaymentFailure.RECORD_FAILED, "Ledger lookup failed with status " + response.statusCode());
         }
+        if (terminal(response.body())) {
+            return Optional.empty();
+        }
         return Optional.of(readPosting(response.body(), idempotencyKey));
     }
 
@@ -135,17 +138,25 @@ public final class HttpLedgerAdapter implements LedgerPort {
 
     @Override
     public LedgerPosting confirmHold(String idempotencyKey) {
-        Optional<LedgerPosting> existing = findByIdempotencyKey(idempotencyKey);
-        if (existing.isPresent()) {
-            return existing.get();
+        HttpResponse<String> response = lookup(idempotencyKey);
+        if (response.statusCode() == 404) {
+            throw new PaymentFlowException(PaymentFailure.UNBALANCED_POSTING,
+                    "The ledger has no hold to confirm for " + idempotencyKey + ".");
         }
-        throw new PaymentFlowException(PaymentFailure.UNBALANCED_POSTING,
-                "The ledger has no hold to confirm for " + idempotencyKey + ".");
+        if ("POSTED".equals(statusOf(response.body()))) {
+            return readPosting(response.body(), idempotencyKey);
+        }
+        patchStatus(readId(response.body(), "transactionId"), "POSTED", "payment-confirm");
+        return readPosting(response.body(), idempotencyKey);
     }
 
     @Override
     public void releaseHold(String idempotencyKey) {
-        findByIdempotencyKey(idempotencyKey).ifPresent(posting -> reverse(posting, idempotencyKey + ":release"));
+        HttpResponse<String> response = lookup(idempotencyKey);
+        if (response.statusCode() == 404 || "REVERSED".equals(statusOf(response.body()))) {
+            return;
+        }
+        patchStatus(readId(response.body(), "transactionId"), "REVERSED", "payment-cancel");
     }
 
     @Override
@@ -159,6 +170,34 @@ public final class HttpLedgerAdapter implements LedgerPort {
             flipped.add(new LedgerLeg(leg.accountId(), leg.accountSpaceId(), leg.side().opposite(), leg.amount(), leg.currency()));
         }
         return post(reversalKey, flipped);
+    }
+
+    private HttpResponse<String> lookup(String idempotencyKey) {
+        return send(HttpRequest.newBuilder(URI.create(baseUrl + "/api/v1/transactions/by-reference/" + idempotencyKey)).GET());
+    }
+
+    private void patchStatus(UUID transactionId, String status, String reason) {
+        String path = baseUrl + "/api/v1/transactions/" + transactionId + "/status?newStatus=" + status
+                + "&reason=" + java.net.URLEncoder.encode(reason, java.nio.charset.StandardCharsets.UTF_8);
+        HttpResponse<String> response = send(HttpRequest.newBuilder(URI.create(path))
+                .method("PATCH", HttpRequest.BodyPublishers.noBody()));
+        if (response.statusCode() >= 400) {
+            throw new PaymentFlowException(PaymentFailure.RECORD_FAILED,
+                    "Ledger status update was rejected with status " + response.statusCode() + ".");
+        }
+    }
+
+    private boolean terminal(String body) {
+        String status = statusOf(body);
+        return "PENDING".equals(status) || "REVERSED".equals(status) || "FAILED".equals(status);
+    }
+
+    private String statusOf(String body) {
+        try {
+            return json.readTree(body).path("transactionStatus").asText("");
+        } catch (Exception ex) {
+            return "";
+        }
     }
 
     private LedgerPosting readPosting(String body, String key) {

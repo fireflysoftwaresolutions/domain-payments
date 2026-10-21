@@ -80,4 +80,44 @@ class HttpLedgerAdapterTest {
             server.stop(0);
         }
     }
+
+    @Test
+    void holdConfirmAndCancelUseLedgerStatus() throws Exception {
+        List<String> calls = new CopyOnWriteArrayList<>();
+        String transaction = "{\"transactionId\":\"10000000-0000-4000-8000-000000000077\",\"transactionStatus\":\"PENDING\",\"currency\":\"EUR\",\"totalAmount\":25.00,\"accountId\":\"10000000-0000-4000-8000-000000000011\"}";
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            String path = exchange.getRequestURI().getPath();
+            String query = exchange.getRequestURI().getRawQuery() == null ? "" : exchange.getRequestURI().getRawQuery();
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            calls.add(exchange.getRequestMethod() + " " + path + "?" + query + " " + body);
+            byte[] response = transaction.getBytes(StandardCharsets.UTF_8);
+            int status = path.endsWith("/legs") || "POST".equals(exchange.getRequestMethod()) ? 201 : 200;
+            if (path.contains("/by-reference/") && calls.stream().noneMatch(call -> call.startsWith("POST "))) {
+                exchange.sendResponseHeaders(404, -1);
+                exchange.close();
+                return;
+            }
+            exchange.sendResponseHeaders(status, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        server.start();
+        try {
+            HttpLedgerAdapter adapter = new HttpLedgerAdapter("http://127.0.0.1:" + server.getAddress().getPort());
+            UUID debit = UUID.fromString("10000000-0000-4000-8000-000000000011");
+            UUID credit = UUID.fromString("44444444-4444-4444-8444-444444444441");
+            adapter.hold("hold-1", List.of(
+                    new LedgerLeg(debit, null, EntrySide.DEBIT, new BigDecimal("25.00"), "EUR"),
+                    new LedgerLeg(credit, null, EntrySide.CREDIT, new BigDecimal("25.00"), "EUR")));
+            adapter.confirmHold("hold-1");
+            adapter.releaseHold("hold-1");
+            String joined = String.join("\n", calls);
+            assertTrue(joined.contains("\"transactionStatus\":\"PENDING\""));
+            assertTrue(joined.contains("PATCH /api/v1/transactions/10000000-0000-4000-8000-000000000077/status?newStatus=POSTED"));
+            assertTrue(joined.contains("PATCH /api/v1/transactions/10000000-0000-4000-8000-000000000077/status?newStatus=REVERSED"));
+        } finally {
+            server.stop(0);
+        }
+    }
 }

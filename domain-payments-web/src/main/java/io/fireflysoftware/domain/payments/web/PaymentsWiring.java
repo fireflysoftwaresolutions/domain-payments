@@ -51,13 +51,12 @@ public class PaymentsWiring {
 
     @Bean
     PaymentTccHub paymentTccHub(LedgerPort ledger,
-                                AccountPositionPort accounts,
                                 PaymentRecordPort records,
                                 PaymentRailPort rail,
                                 PspPort psp,
                                 PaymentConfigurationPort configuration,
                                 PaymentMasterPort masters) {
-        return PaymentTccHub.sandbox(ledger, accounts, records, rail, psp, configuration, masters);
+        return PaymentTccHub.sandbox(ledger, records, rail, psp, configuration, masters);
     }
 
     @Bean

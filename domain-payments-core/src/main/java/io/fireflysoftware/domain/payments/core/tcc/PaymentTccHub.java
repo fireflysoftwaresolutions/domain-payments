@@ -36,12 +36,9 @@ import io.fireflysoftware.domain.payments.PaymentScheme;
 import io.fireflysoftware.domain.payments.PaymentStatus;
 import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
-import io.fireflysoftware.domain.payments.PositionKind;
-import io.fireflysoftware.domain.payments.PositionMovement;
 import io.fireflysoftware.domain.payments.StoredPayment;
 import io.fireflysoftware.domain.payments.SyncMessages.OutboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.SyncResult;
-import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
 import io.fireflysoftware.domain.payments.core.ports.LedgerPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentConfigurationPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentMasterPort;
@@ -79,7 +76,6 @@ public final class PaymentTccHub {
     private static final String INTERNAL_SCA = "payments.sca.required.INTERNAL";
 
     private final LedgerPort ledger;
-    private final AccountPositionPort accounts;
     private final PaymentRecordPort records;
     private final PaymentRailPort rail;
     private final PspPort psp;
@@ -96,7 +92,6 @@ public final class PaymentTccHub {
     private final ConcurrentHashMap<String, UUID> byKey = new ConcurrentHashMap<>();
 
     public PaymentTccHub(LedgerPort ledger,
-                         AccountPositionPort accounts,
                          PaymentRecordPort records,
                          PaymentRailPort rail,
                          PspPort psp,
@@ -106,7 +101,6 @@ public final class PaymentTccHub {
                          BusinessParameterPort parameters,
                          ScaChallengeService sca) {
         this.ledger = ledger;
-        this.accounts = accounts;
         this.records = records;
         this.rail = rail;
         this.psp = psp;
@@ -126,13 +120,12 @@ public final class PaymentTccHub {
     }
 
     public static PaymentTccHub sandbox(LedgerPort ledger,
-                                        AccountPositionPort accounts,
                                         PaymentRecordPort records,
                                         PaymentRailPort rail,
                                         PspPort psp,
                                         PaymentConfigurationPort configuration,
                                         PaymentMasterPort masters) {
-        return new PaymentTccHub(ledger, accounts, records, rail, psp, configuration, masters, new SchemeRouter(),
+        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(),
                 new SandboxBusinessParameterAdapter(), new ScaChallengeService(new io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter()));
     }
 
@@ -263,7 +256,6 @@ public final class PaymentTccHub {
             return;
         }
         LedgerPosting posting = ledger.confirmHold(session.idempotencyKey);
-        accounts.apply(position(session));
         boolean synced = false;
         String reference = null;
         if (session.routing.route().outbound()) {
@@ -337,19 +329,6 @@ public final class PaymentTccHub {
         return List.of(
                 new LedgerLeg(debit, debitSpace, EntrySide.DEBIT, command.amount(), currency),
                 new LedgerLeg(credit, creditSpace, EntrySide.CREDIT, command.amount(), currency));
-    }
-
-    private PositionMovement position(Session session) {
-        PositionKind kind = session.routing.spaceMovement() ? PositionKind.SPACE_TRANSFER
-                : session.routing.route() == MovementRoute.INTERNAL_BOOK ? PositionKind.ACCOUNT_TRANSFER
-                : session.routing.route().outbound() ? PositionKind.CUSTOMER_DEBIT
-                : PositionKind.CUSTOMER_CREDIT;
-        LedgerPosting posting = ledger.findByIdempotencyKey(session.idempotencyKey).orElseThrow();
-        LedgerLeg debit = posting.legs().get(0);
-        LedgerLeg credit = posting.legs().get(1);
-        return new PositionMovement(session.idempotencyKey, kind, debit.accountId(), credit.accountId(),
-                debit.accountSpaceId(), credit.accountSpaceId(), session.command.spaceType(),
-                session.command.amount(), session.currency);
     }
 
     private void validate(MovementCommand command, PaymentsCatalog catalog, SchemeRouting routing, String currency) {
