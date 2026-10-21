@@ -1,6 +1,26 @@
 server:
   port: ${SERVER_PORT:8092}
 
+spring:
+  autoconfigure:
+    exclude:
+      - io.github.resilience4j.springboot3.bulkhead.autoconfigure.BulkheadAutoConfiguration
+      - io.github.resilience4j.springboot3.bulkhead.autoconfigure.BulkheadMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.bulkhead.autoconfigure.ThreadPoolBulkheadMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.retry.autoconfigure.RetryAutoConfiguration
+      - io.github.resilience4j.springboot3.retry.autoconfigure.RetryMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration
+      - io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerStreamEventsAutoConfiguration
+      - io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakersHealthIndicatorAutoConfiguration
+      - io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimiterAutoConfiguration
+      - io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimiterMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimitersHealthIndicatorAutoConfiguration
+      - io.github.resilience4j.springboot3.timelimiter.autoconfigure.TimeLimiterAutoConfiguration
+      - io.github.resilience4j.springboot3.timelimiter.autoconfigure.TimeLimiterMetricsAutoConfiguration
+      - io.github.resilience4j.springboot3.micrometer.autoconfigure.TimerAutoConfiguration
+      - io.github.resilience4j.springboot3.scheduled.threadpool.autoconfigure.ContextAwareScheduledThreadPoolAutoConfiguration
+
 firefly:
   payments:
     mode: sandbox
@@ -10,3 +30,4 @@ firefly:
     payments-core-base-url: ${PAYMENTS_CORE_URL:http://localhost:8084}
     config-base-url: ${CONFIG_URL:http://localhost:8085}
     masters-base-url: ${MASTERS_URL:http://localhost:8086}
+    sca-base-url: ${SCA_URL:http://localhost:8087}

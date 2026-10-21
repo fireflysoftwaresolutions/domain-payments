@@ -51,10 +51,10 @@ class PaymentsControllerTest {
         UUID source = UUID.fromString("10000000-0000-4000-8000-000000000011");
         MovementResult tried = controller.tryPayment(new MovementCommand(PaymentScheme.DOMESTIC_OUTBOUND, "hub-out",
                 new BigDecimal("25.00"), "EUR", party, contract, source, null, null, null, null, method,
-                "Beneficiary", null, null, null));
+                "Beneficiary", null, null, null)).block();
         assertNotNull(tried.challengeId());
         assertNotEquals("sandbox", tried.challengeValue());
-        MovementResult confirmed = controller.confirm(tried.paymentId(), new PaymentsController.Confirmation(tried.challengeValue()));
+        MovementResult confirmed = controller.confirm(tried.paymentId(), new PaymentsController.Confirmation(tried.challengeValue())).block();
         assertEquals(PaymentPhase.CONFIRMED, confirmed.phase());
         assertTrue(confirmed.thirdPartySynced());
     }

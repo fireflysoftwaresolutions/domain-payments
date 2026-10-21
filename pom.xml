@@ -22,6 +22,7 @@
         <module>domain-payments-core</module>
         <module>domain-payments-infra</module>
         <module>domain-payments-web</module>
+        <module>domain-payments-sdk</module>
     </modules>
 
     <properties>
@@ -59,6 +60,11 @@
             <dependency>
                 <groupId>io.fireflysoftware</groupId>
                 <artifactId>domain-payments-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fireflysoftware</groupId>
+                <artifactId>domain-payments-sdk</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

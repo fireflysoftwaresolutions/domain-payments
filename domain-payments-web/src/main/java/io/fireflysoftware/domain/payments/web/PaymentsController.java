@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
@@ -42,23 +44,23 @@ public class PaymentsController {
 
     @PostMapping("/tries")
     @ResponseStatus(HttpStatus.CREATED)
-    public MovementResult tryPayment(@RequestBody MovementCommand command) {
-        return hub.tryPayment(command);
+    public Mono<MovementResult> tryPayment(@RequestBody MovementCommand command) {
+        return Mono.fromCallable(() -> hub.tryPayment(command)).subscribeOn(Schedulers.boundedElastic());
     }
 
     @PostMapping("/{paymentId}/confirmations")
-    public MovementResult confirm(@PathVariable UUID paymentId, @RequestBody Confirmation confirmation) {
-        return hub.confirm(paymentId, confirmation.response());
+    public Mono<MovementResult> confirm(@PathVariable UUID paymentId, @RequestBody Confirmation confirmation) {
+        return Mono.fromCallable(() -> hub.confirm(paymentId, confirmation.response())).subscribeOn(Schedulers.boundedElastic());
     }
 
     @PostMapping("/{paymentId}/cancellations")
-    public MovementResult cancel(@PathVariable UUID paymentId) {
-        return hub.cancel(paymentId);
+    public Mono<MovementResult> cancel(@PathVariable UUID paymentId) {
+        return Mono.fromCallable(() -> hub.cancel(paymentId)).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/{paymentId}")
-    public MovementResult status(@PathVariable UUID paymentId) {
-        return hub.status(paymentId);
+    public Mono<MovementResult> status(@PathVariable UUID paymentId) {
+        return Mono.fromCallable(() -> hub.status(paymentId)).subscribeOn(Schedulers.boundedElastic());
     }
 
     public record Confirmation(String response) {

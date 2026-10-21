@@ -16,8 +16,9 @@
 
 package io.fireflysoftware.domain.payments.core.tcc;
 
-import io.fireflysoftware.domain.common.sca.challenge.ChallengeDeliveryPort;
 import io.fireflysoftware.domain.common.sca.challenge.ChallengeStatus;
+import io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.common.sca.challenge.SandboxCoreScaClient;
 import io.fireflysoftware.domain.common.sca.challenge.ScaChallengeService;
 import io.fireflysoftware.domain.configuration.parameters.BusinessParameter;
 import io.fireflysoftware.domain.configuration.parameters.BusinessParameterPort;
@@ -37,6 +38,7 @@ import io.fireflysoftware.domain.payments.PaymentStatus;
 import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
 import io.fireflysoftware.domain.payments.StoredPayment;
+import io.fireflysoftware.domain.payments.SyncMessages.InboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.OutboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.SyncResult;
 import io.fireflysoftware.domain.payments.core.ports.LedgerPort;
@@ -119,23 +121,34 @@ public final class PaymentTccHub {
         this.cancelTcc = cancelDefinition();
     }
 
+    public static PaymentTccHub create(LedgerPort ledger,
+                                       PaymentRecordPort records,
+                                       PaymentRailPort rail,
+                                       PspPort psp,
+                                       PaymentConfigurationPort configuration,
+                                       PaymentMasterPort masters,
+                                       ScaChallengeService sca) {
+        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(),
+                new SandboxBusinessParameterAdapter(), sca);
+    }
+
     public static PaymentTccHub sandbox(LedgerPort ledger,
                                         PaymentRecordPort records,
                                         PaymentRailPort rail,
                                         PspPort psp,
                                         PaymentConfigurationPort configuration,
                                         PaymentMasterPort masters) {
-        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(),
-                new SandboxBusinessParameterAdapter(), new ScaChallengeService(new io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter()));
+        return create(ledger, records, rail, psp, configuration, masters,
+                new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter()));
     }
 
     public MovementResult tryPayment(MovementCommand command) {
-        String key = command.idempotencyKey();
-        if (key != null && !key.isBlank()) {
-            UUID existingId = byKey.get(key);
-            if (existingId != null) {
-                return view(sessions.get(existingId));
-            }
+        UUID existingId = existing(command.idempotencyKey());
+        if (existingId == null) {
+            existingId = existing(command.thirdPartyReference());
+        }
+        if (existingId != null) {
+            return view(sessions.get(existingId));
         }
         TccResult result = engine.execute(tryTcc, TccInputs.of("payment", command)).block();
         if (result == null || !result.isConfirmed()) {
@@ -215,21 +228,32 @@ public final class PaymentTccHub {
         SchemeRouting routing = router.routing(command.scheme(), catalog);
         String currency = canonical(command.currency(), master);
         validate(command, catalog, routing, currency);
-        String key = command.idempotencyKey() == null || command.idempotencyKey().isBlank()
-                ? UUID.randomUUID().toString()
-                : command.idempotencyKey();
+        String key = routing.route().inbound() ? reference(command) : callerKey(command);
+        UUID existing = byKey.get(key);
+        if (existing != null) {
+            return existing;
+        }
+        if (routing.route().inbound()) {
+            SyncResult accepted = acceptInbound(command, routing, currency);
+            if (!accepted.accepted()) {
+                throw new PaymentFlowException(PaymentFailure.SYNC_REJECTED,
+                        accepted.reason() == null ? "The inbound payment was not accepted." : accepted.reason());
+            }
+        }
         UUID paymentId = UUID.randomUUID();
         List<LedgerLeg> legs = legs(command, routing, currency);
         ledger.hold(key, legs);
+        UUID operationId = null;
         UUID challengeId = null;
         String challengeValue = null;
         if (scaRequired(routing)) {
-            ChallengeDeliveryPort.Delivery delivered = sca.create(paymentId);
-            challengeId = delivered.challengeId();
-            challengeValue = delivered.challengeValue();
+            ScaChallengeService.Issued issued = sca.create(paymentId, command.partyId());
+            operationId = issued.operationId();
+            challengeId = issued.challengeId();
+            challengeValue = issued.challengeValue();
         }
         Session session = new Session(paymentId, command, routing, currency, key, PaymentPhase.TRYING,
-                challengeId, challengeValue, null, false);
+                operationId, challengeId, challengeValue, null, false);
         sessions.put(paymentId, session);
         byKey.put(key, paymentId);
         records.save(stored(session, PaymentStatus.INITIATED));
@@ -242,7 +266,7 @@ public final class PaymentTccHub {
             return session.paymentId;
         }
         if (session.challengeId != null) {
-            ChallengeStatus status = sca.validate(session.challengeId, command.response());
+            ChallengeStatus status = sca.validate(session.operationId, session.challengeId, command.response());
             if (status != ChallengeStatus.VALIDATED) {
                 throw new PaymentFlowException(PaymentFailure.VALIDATION, "The challenge response was not accepted.");
             }
@@ -266,6 +290,9 @@ public final class PaymentTccHub {
             }
             synced = true;
             reference = sync.reference();
+        } else if (session.routing.route().inbound()) {
+            synced = true;
+            reference = session.command.thirdPartyReference();
         }
         Session confirmed = session.confirmed(posting, synced, reference);
         sessions.put(paymentId, confirmed);
@@ -282,7 +309,7 @@ public final class PaymentTccHub {
         }
         ledger.releaseHold(session.idempotencyKey);
         if (session.challengeId != null) {
-            sca.expire(session.challengeId);
+            sca.expire(session.operationId, session.challengeId);
         }
         Session cancelled = session.cancelled();
         sessions.put(paymentId, cancelled);
@@ -306,7 +333,35 @@ public final class PaymentTccHub {
             BusinessParameter parameter = parameters.findByKey(INTERNAL_SCA).block();
             return parameter != null && "true".equalsIgnoreCase(parameter.value());
         }
-        return routing.route().outbound() || routing.scheme() == PaymentScheme.PSP_INBOUND;
+        return routing.route().outbound();
+    }
+
+    private SyncResult acceptInbound(MovementCommand command, SchemeRouting routing, String currency) {
+        InboundInstruction instruction = new InboundInstruction(command.thirdPartyReference(), command.amount(),
+                currency, command.destinationAccountId(), routing.railKind(), routing.pspInstrument());
+        if (routing.route() == MovementRoute.INBOUND_PSP) {
+            return psp.acceptInbound(instruction);
+        }
+        return rail.acceptInbound(instruction);
+    }
+
+    private static String reference(MovementCommand command) {
+        if (command.thirdPartyReference() == null || command.thirdPartyReference().isBlank()) {
+            throw new PaymentFlowException(PaymentFailure.VALIDATION, "An inbound payment needs a third-party reference.");
+        }
+        return command.thirdPartyReference();
+    }
+
+    private static String callerKey(MovementCommand command) {
+        return command.idempotencyKey() == null || command.idempotencyKey().isBlank()
+                ? UUID.randomUUID().toString() : command.idempotencyKey();
+    }
+
+    private UUID existing(String key) {
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+        return byKey.get(key);
     }
 
     private List<LedgerLeg> legs(MovementCommand command, SchemeRouting routing, String currency) {
@@ -402,16 +457,16 @@ public final class PaymentTccHub {
     }
 
     private record Session(UUID paymentId, MovementCommand command, SchemeRouting routing, String currency,
-                           String idempotencyKey, PaymentPhase phase, UUID challengeId, String challengeValue,
-                           String syncReference, boolean synced) {
+                           String idempotencyKey, PaymentPhase phase, UUID operationId, UUID challengeId,
+                           String challengeValue, String syncReference, boolean synced) {
         Session confirmed(LedgerPosting posting, boolean synced, String reference) {
             return new Session(paymentId, command, routing, currency, idempotencyKey, PaymentPhase.CONFIRMED,
-                    challengeId, challengeValue, reference, synced);
+                    operationId, challengeId, challengeValue, reference, synced);
         }
 
         Session cancelled() {
             return new Session(paymentId, command, routing, currency, idempotencyKey, PaymentPhase.CANCELLED,
-                    challengeId, challengeValue, syncReference, false);
+                    operationId, challengeId, challengeValue, syncReference, false);
         }
     }
 }

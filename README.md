@@ -41,13 +41,14 @@ Domestic outbound uses a rail the catalog names. The sandbox catalog uses `SEPA`
 
 ## Sandbox and live
 
-`firefly.payments.mode` defaults to `sandbox`. `live` selects the HTTP and library adapters. `firefly.payments.configuration` defaults to `sandbox`. `live` reads channel parameter `payments.catalog` from core-common-config-mgmt and currencies from `GET /api/v1/currencies` on the reference-data service.
+`firefly.payments.mode` defaults to `sandbox`. `live` selects the core SDK and library adapters. `firefly.payments.configuration` defaults to `sandbox`. `live` reads channel parameter `payments.catalog` from core-common-config-mgmt and currencies from `GET /api/v1/currencies` on the reference-data service. The live ledger adapter uses `core-banking-ledger-sdk`. The live rail adapter uses the `library-rails` public API. The live PSP adapter uses the `library-psps` public API. SCA create and validate use `core-common-sca-mgmt-sdk`.
 
 An installer replaces these sandbox classes:
 
 | Sandbox class | Live class |
 | --- | --- |
-| `SandboxLedgerAdapter` | `HttpLedgerAdapter` |
+| `SandboxLedgerAdapter` | `SdkLedgerAdapter` |
+| `SandboxCoreScaClient` | `SdkCoreScaClient` |
 | `SandboxAccountPositionAdapter` | `HttpAccountPositionAdapter` |
 | `SandboxPaymentRecordAdapter` | `HttpPaymentRecordAdapter` |
 | `SandboxPaymentRailAdapter` | `LibraryPaymentRailAdapter` |

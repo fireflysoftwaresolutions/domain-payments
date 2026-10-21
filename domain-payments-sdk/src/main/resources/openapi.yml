@@ -1,0 +1,233 @@
+openapi: 3.0.1
+info:
+  title: domain-payments
+  version: 26.10.3
+servers:
+- url: http://localhost:8092
+tags:
+- name: Payments
+  description: Try, confirm, and cancel a payment
+paths:
+  /api/v1/payments/tries:
+    post:
+      tags:
+      - Payments
+      operationId: tryPayment
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovementCommand"
+      responses:
+        "201":
+          description: Payment reserved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovementResult"
+  /api/v1/payments/{paymentId}/confirmations:
+    post:
+      tags:
+      - Payments
+      operationId: confirmPayment
+      parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Confirmation"
+      responses:
+        "200":
+          description: Payment confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovementResult"
+  /api/v1/payments/{paymentId}/cancellations:
+    post:
+      tags:
+      - Payments
+      operationId: cancelPayment
+      parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Payment cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovementResult"
+  /api/v1/payments/{paymentId}:
+    get:
+      tags:
+      - Payments
+      operationId: readPayment
+      parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovementResult"
+components:
+  schemas:
+    MovementCommand:
+      type: object
+      properties:
+        scheme:
+          type: string
+        idempotencyKey:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        partyId:
+          type: string
+          format: uuid
+        contractId:
+          type: string
+          format: uuid
+        sourceAccountId:
+          type: string
+          format: uuid
+        destinationAccountId:
+          type: string
+          format: uuid
+        sourceSpaceId:
+          type: string
+          format: uuid
+        destinationSpaceId:
+          type: string
+          format: uuid
+        spaceType:
+          type: string
+        paymentMethodId:
+          type: string
+          format: uuid
+        externalAccountName:
+          type: string
+        externalIban:
+          type: string
+        externalBic:
+          type: string
+        thirdPartyReference:
+          type: string
+    Confirmation:
+      type: object
+      properties:
+        response:
+          type: string
+    MovementResult:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        scheme:
+          type: string
+        route:
+          type: string
+        idempotencyKey:
+          type: string
+        thirdPartyReference:
+          type: string
+        thirdPartySynced:
+          type: boolean
+        syncReference:
+          type: string
+        failure:
+          type: string
+        suspenseAccountId:
+          type: string
+          format: uuid
+        nostroAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        posting:
+          $ref: "#/components/schemas/LedgerPosting"
+        reversal:
+          $ref: "#/components/schemas/LedgerPosting"
+        phase:
+          type: string
+        challengeId:
+          type: string
+          format: uuid
+        challengeValue:
+          type: string
+    LedgerPosting:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+        currency:
+          type: string
+        legs:
+          type: array
+          items:
+            $ref: "#/components/schemas/LedgerLeg"
+    LedgerLeg:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        accountSpaceId:
+          type: string
+          format: uuid
+        side:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string

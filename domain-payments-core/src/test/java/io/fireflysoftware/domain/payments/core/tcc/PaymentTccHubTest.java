@@ -141,12 +141,81 @@ class PaymentTccHubTest {
         assertEquals(new SchemeRouter().routing(PaymentScheme.INTERNATIONAL_OUTBOUND, SandboxCatalog.standard()).railKind().name(), "SWIFT");
     }
 
+    @Test
+    void inboundCreditPostsOnceOnTheLedgerAndDoesNotUseThePsp() {
+        MovementResult tried = hub.tryPayment(inbound(PaymentScheme.RAIL_INBOUND, "rail-ref-1"));
+        assertNull(tried.challengeId());
+        assertEquals(0, ledger.postings().size());
+        assertTrue(ledger.holding("rail-ref-1"));
+        assertEquals(1, rail.inboundCalls());
+        assertEquals(0, rail.outboundCalls());
+
+        MovementResult replay = hub.tryPayment(inbound(PaymentScheme.RAIL_INBOUND, "rail-ref-1"));
+        assertEquals(tried.paymentId(), replay.paymentId());
+        assertEquals(1, rail.inboundCalls());
+
+        MovementResult confirmed = hub.confirm(tried.paymentId(), null);
+        assertEquals(PaymentPhase.CONFIRMED, confirmed.phase());
+        assertEquals(1, ledger.postings().size());
+        assertEquals(SandboxCatalog.clearing().inboundClearingAccountId(), confirmed.posting().legs().get(0).accountId());
+        assertEquals(UUID.fromString("44444444-4444-4444-8444-444444444442"), confirmed.posting().legs().get(0).accountId());
+        assertEquals(DESTINATION, confirmed.posting().legs().get(1).accountId());
+        assertEquals(0, rail.outboundCalls());
+
+        hub.confirm(tried.paymentId(), null);
+        hub.tryPayment(inbound(PaymentScheme.RAIL_INBOUND, "rail-ref-1"));
+        assertEquals(1, ledger.postings().size());
+        assertEquals(1, rail.inboundCalls());
+    }
+
+    @Test
+    void cardCollectionUsesThePspAndACreditTransferDoesNot() {
+        SandboxPspAdapter psp = new SandboxPspAdapter();
+        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
+                rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        MovementResult card = hub.tryPayment(inbound(PaymentScheme.PSP_INBOUND, "card-ref-1"));
+        hub.confirm(card.paymentId(), null);
+        assertEquals(1, psp.inboundCalls());
+        assertEquals(0, psp.outboundCalls());
+        assertEquals(0, rail.inboundCalls());
+        assertEquals(0, rail.outboundCalls());
+
+        MovementResult transfer = hub.tryPayment(outbound("sepa-1"));
+        hub.confirm(transfer.paymentId(), transfer.challengeValue());
+        assertEquals(1, rail.outboundCalls());
+        assertEquals(0, psp.outboundCalls());
+    }
+
+    @Test
+    void spaceMovementIsLedgerOnly() {
+        UUID from = UUID.randomUUID();
+        UUID to = UUID.randomUUID();
+        MovementCommand command = new MovementCommand(PaymentScheme.SPACE_TRANSFER, "space-1", AMOUNT, "EUR",
+                PARTY, CONTRACT, SOURCE, SOURCE, from, to, "SAVINGS", METHOD, null, null, null, null);
+        MovementResult tried = hub.tryPayment(command);
+        assertNull(tried.challengeId());
+        MovementResult confirmed = hub.confirm(tried.paymentId(), null);
+        assertEquals(PaymentPhase.CONFIRMED, confirmed.phase());
+        assertFalse(confirmed.thirdPartySynced());
+        assertEquals(SOURCE, confirmed.posting().legs().get(0).accountId());
+        assertEquals(from, confirmed.posting().legs().get(0).accountSpaceId());
+        assertEquals(SOURCE, confirmed.posting().legs().get(1).accountId());
+        assertEquals(to, confirmed.posting().legs().get(1).accountSpaceId());
+        assertEquals(0, rail.outboundCalls());
+        assertEquals(0, rail.inboundCalls());
+    }
+
     private MovementCommand outbound(String key) {
         return command(PaymentScheme.DOMESTIC_OUTBOUND, key, SOURCE, null);
     }
 
     private MovementCommand internal(String key) {
         return command(PaymentScheme.INTERNAL_TRANSFER, key, SOURCE, DESTINATION);
+    }
+
+    private MovementCommand inbound(PaymentScheme scheme, String reference) {
+        return new MovementCommand(scheme, reference, AMOUNT, "EUR", PARTY, CONTRACT, null, DESTINATION,
+                null, null, null, METHOD, null, null, null, reference);
     }
 
     private MovementCommand command(PaymentScheme scheme, String key, UUID source, UUID destination) {

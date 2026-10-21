@@ -16,6 +16,10 @@
 
 package io.fireflysoftware.domain.payments.web;
 
+import io.fireflysoftware.domain.common.sca.challenge.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.common.sca.challenge.SandboxCoreScaClient;
+import io.fireflysoftware.domain.common.sca.challenge.ScaChallengeService;
+import io.fireflysoftware.domain.common.sca.challenge.SdkCoreScaClient;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
 import io.fireflysoftware.domain.payments.core.ports.LedgerPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentConfigurationPort;
@@ -32,7 +36,7 @@ import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
 import io.fireflysoftware.domain.payments.infra.HttpAccountPositionAdapter;
-import io.fireflysoftware.domain.payments.infra.HttpLedgerAdapter;
+import io.fireflysoftware.domain.payments.infra.SdkLedgerAdapter;
 import io.fireflysoftware.domain.payments.infra.HttpPaymentConfigurationAdapter;
 import io.fireflysoftware.domain.payments.infra.HttpPaymentMasterAdapter;
 import io.fireflysoftware.domain.payments.infra.HttpPaymentRecordAdapter;
@@ -55,8 +59,21 @@ public class PaymentsWiring {
                                 PaymentRailPort rail,
                                 PspPort psp,
                                 PaymentConfigurationPort configuration,
-                                PaymentMasterPort masters) {
-        return PaymentTccHub.sandbox(ledger, records, rail, psp, configuration, masters);
+                                PaymentMasterPort masters,
+                                ScaChallengeService sca) {
+        return PaymentTccHub.create(ledger, records, rail, psp, configuration, masters, sca);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "sandbox", matchIfMissing = true)
+    ScaChallengeService sandboxSca() {
+        return new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter());
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "live")
+    ScaChallengeService liveSca(@Value("${firefly.payments.sca-base-url}") String baseUrl) {
+        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), new SandboxChallengeDeliveryAdapter());
     }
 
     @Bean
@@ -104,7 +121,7 @@ public class PaymentsWiring {
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "live")
     LedgerPort liveLedger(@Value("${firefly.payments.ledger-base-url}") String baseUrl) {
-        return new HttpLedgerAdapter(baseUrl);
+        return new SdkLedgerAdapter(baseUrl);
     }
 
     @Bean

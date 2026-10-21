@@ -20,10 +20,42 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "io.fireflysoftware.domain.payments",
-        excludeName = "io.fireflysoftware.rails.config.RailsAutoConfiguration")
+        excludeName = {
+                "io.fireflysoftware.rails.config.RailsAutoConfiguration",
+                "io.github.resilience4j.springboot3.bulkhead.autoconfigure.BulkheadAutoConfiguration",
+                "io.github.resilience4j.springboot3.bulkhead.autoconfigure.BulkheadMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.bulkhead.autoconfigure.ThreadPoolBulkheadMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.retry.autoconfigure.RetryAutoConfiguration",
+                "io.github.resilience4j.springboot3.retry.autoconfigure.RetryMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration",
+                "io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerStreamEventsAutoConfiguration",
+                "io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakersHealthIndicatorAutoConfiguration",
+                "io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimiterAutoConfiguration",
+                "io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimiterMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimitersHealthIndicatorAutoConfiguration",
+                "io.github.resilience4j.springboot3.timelimiter.autoconfigure.TimeLimiterAutoConfiguration",
+                "io.github.resilience4j.springboot3.timelimiter.autoconfigure.TimeLimiterMetricsAutoConfiguration",
+                "io.github.resilience4j.springboot3.micrometer.autoconfigure.TimerAutoConfiguration",
+                "io.github.resilience4j.springboot3.scheduled.threadpool.autoconfigure.ContextAwareScheduledThreadPoolAutoConfiguration",
+                "org.fireflyframework.data.config.EdaAutoConfiguration",
+                "org.fireflyframework.data.config.CqrsAutoConfiguration",
+                "org.fireflyframework.data.config.JobOrchestrationAutoConfiguration",
+                "org.fireflyframework.data.config.OrchestrationAutoConfiguration",
+                "org.fireflyframework.data.config.ObservabilityAutoConfiguration",
+                "org.fireflyframework.data.resiliency.ResiliencyAutoConfiguration",
+                "org.fireflyframework.data.config.PersistenceAutoConfiguration",
+                "org.fireflyframework.data.config.DataEnrichmentAutoConfiguration",
+                "org.fireflyframework.data.config.DataQualityAutoConfiguration",
+                "org.fireflyframework.data.config.DataLineageAutoConfiguration",
+                "org.fireflyframework.orchestration.config.OrchestrationPersistenceAutoConfiguration"
+        })
 public class DomainPaymentsApplication {
 
     public static void main(String[] args) {
+        if (System.getenv("SERVER_PORT") == null && System.getProperty("server.port") == null) {
+            System.setProperty("server.port", "8092");
+        }
         SpringApplication.run(DomainPaymentsApplication.class, args);
     }
 }
