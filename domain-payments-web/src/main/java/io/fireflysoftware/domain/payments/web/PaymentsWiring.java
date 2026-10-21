@@ -23,8 +23,7 @@ import io.fireflysoftware.domain.payments.core.ports.PaymentMasterPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentRailPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentRecordPort;
 import io.fireflysoftware.domain.payments.core.ports.PspPort;
-import io.fireflysoftware.domain.payments.core.routing.SchemeRouter;
-import io.fireflysoftware.domain.payments.core.saga.PaymentSaga;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxAccountPositionAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
@@ -51,14 +50,14 @@ import org.springframework.context.annotation.Configuration;
 public class PaymentsWiring {
 
     @Bean
-    PaymentSaga paymentSaga(LedgerPort ledger,
-                            AccountPositionPort accounts,
-                            PaymentRecordPort records,
-                            PaymentRailPort rail,
-                            PspPort psp,
-                            PaymentConfigurationPort configuration,
-                            PaymentMasterPort masters) {
-        return new PaymentSaga(ledger, accounts, records, rail, psp, configuration, masters, new SchemeRouter());
+    PaymentTccHub paymentTccHub(LedgerPort ledger,
+                                AccountPositionPort accounts,
+                                PaymentRecordPort records,
+                                PaymentRailPort rail,
+                                PspPort psp,
+                                PaymentConfigurationPort configuration,
+                                PaymentMasterPort masters) {
+        return PaymentTccHub.sandbox(ledger, accounts, records, rail, psp, configuration, masters);
     }
 
     @Bean

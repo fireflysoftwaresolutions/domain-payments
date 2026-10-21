@@ -16,13 +16,11 @@
 
 package io.fireflysoftware.domain.payments.web;
 
-import io.fireflysoftware.domain.payments.EntrySide;
 import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
+import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
-import io.fireflysoftware.domain.payments.PaymentStatus;
-import io.fireflysoftware.domain.payments.core.routing.SchemeRouter;
-import io.fireflysoftware.domain.payments.core.saga.PaymentSaga;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxAccountPositionAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
@@ -36,42 +34,29 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PaymentsControllerTest {
 
     @Test
-    void hubServesInternalOutboundAndInbound() {
-        PaymentSaga saga = new PaymentSaga(new SandboxLedgerAdapter(), new SandboxAccountPositionAdapter(),
+    void tryThenConfirmUsesTheGeneratedChallenge() {
+        PaymentTccHub hub = PaymentTccHub.sandbox(new SandboxLedgerAdapter(), new SandboxAccountPositionAdapter(),
                 new SandboxPaymentRecordAdapter(), new SandboxPaymentRailAdapter(), new SandboxPspAdapter(),
-                new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter(), new SchemeRouter());
-        PaymentsController controller = new PaymentsController(saga);
-        UUID party = UUID.fromString("11111111-1111-4111-8111-111111111111");
+                new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        PaymentsController controller = new PaymentsController(hub);
+        UUID party = UUID.fromString("10000000-0000-4000-8000-0000000000aa");
         UUID contract = UUID.fromString("10000000-0000-4000-8000-000000000021");
         UUID method = UUID.fromString("10000000-0000-4000-8000-000000000031");
         UUID source = UUID.fromString("10000000-0000-4000-8000-000000000011");
-        UUID destination = UUID.fromString("10000000-0000-4000-8000-000000000012");
-        BigDecimal amount = new BigDecimal("25.00");
-
-        MovementResult internal = controller.move(new MovementCommand(PaymentScheme.INTERNAL_TRANSFER, "hub-internal",
-                amount, "EUR", party, contract, source, destination, null, null, null, method, null, null, null, null));
-        MovementResult outbound = controller.move(new MovementCommand(PaymentScheme.DOMESTIC_OUTBOUND, "hub-outbound",
-                amount, "EUR", party, contract, source, null, null, null, null, method, "Beneficiary", null, null, null));
-        MovementResult inbound = controller.move(new MovementCommand(PaymentScheme.RAIL_INBOUND, null,
-                amount, "EUR", party, contract, null, destination, null, null, null, method, null, null, null, "HUB-IN-1"));
-
-        assertEquals(PaymentStatus.COMPLETED, internal.status());
-        assertFalse(internal.thirdPartySynced());
-        assertEquals(EntrySide.DEBIT, internal.posting().legs().get(0).side());
-        assertEquals(source, internal.posting().legs().get(0).accountId());
-        assertEquals(destination, internal.posting().legs().get(1).accountId());
-
-        assertTrue(outbound.thirdPartySynced());
-        assertEquals(source, outbound.posting().legs().get(0).accountId());
-
-        assertTrue(inbound.thirdPartySynced());
-        assertEquals(destination, inbound.posting().legs().get(1).accountId());
-        assertEquals(inbound.paymentId(), controller.status(inbound.paymentId()).paymentId());
+        MovementResult tried = controller.tryPayment(new MovementCommand(PaymentScheme.DOMESTIC_OUTBOUND, "hub-out",
+                new BigDecimal("25.00"), "EUR", party, contract, source, null, null, null, null, method,
+                "Beneficiary", null, null, null));
+        assertNotNull(tried.challengeId());
+        assertNotEquals("sandbox", tried.challengeValue());
+        MovementResult confirmed = controller.confirm(tried.paymentId(), new PaymentsController.Confirmation(tried.challengeValue()));
+        assertEquals(PaymentPhase.CONFIRMED, confirmed.phase());
+        assertTrue(confirmed.thirdPartySynced());
     }
 }

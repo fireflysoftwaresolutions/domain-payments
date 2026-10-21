@@ -24,5 +24,6 @@ public enum PaymentStatus {
     INITIATED,
     COMPLETED,
     FAILED,
-    UNMATCHED
+    UNMATCHED,
+    CANCELLED
 }

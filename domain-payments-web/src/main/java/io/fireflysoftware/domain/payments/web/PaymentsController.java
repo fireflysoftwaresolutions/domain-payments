@@ -18,7 +18,7 @@ package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
-import io.fireflysoftware.domain.payments.core.saga.PaymentSaga;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,20 +34,33 @@ import java.util.UUID;
 @RequestMapping("/api/v1/payments")
 public class PaymentsController {
 
-    private final PaymentSaga saga;
+    private final PaymentTccHub hub;
 
-    public PaymentsController(PaymentSaga saga) {
-        this.saga = saga;
+    public PaymentsController(PaymentTccHub hub) {
+        this.hub = hub;
     }
 
-    @PostMapping("/movements")
+    @PostMapping("/tries")
     @ResponseStatus(HttpStatus.CREATED)
-    public MovementResult move(@RequestBody MovementCommand command) {
-        return saga.execute(command);
+    public MovementResult tryPayment(@RequestBody MovementCommand command) {
+        return hub.tryPayment(command);
+    }
+
+    @PostMapping("/{paymentId}/confirmations")
+    public MovementResult confirm(@PathVariable UUID paymentId, @RequestBody Confirmation confirmation) {
+        return hub.confirm(paymentId, confirmation.response());
+    }
+
+    @PostMapping("/{paymentId}/cancellations")
+    public MovementResult cancel(@PathVariable UUID paymentId) {
+        return hub.cancel(paymentId);
     }
 
     @GetMapping("/{paymentId}")
     public MovementResult status(@PathVariable UUID paymentId) {
-        return saga.status(paymentId);
+        return hub.status(paymentId);
+    }
+
+    public record Confirmation(String response) {
     }
 }

@@ -76,6 +76,10 @@ public final class HttpLedgerAdapter implements LedgerPort {
         if (existing.isPresent()) {
             return existing.get();
         }
+        return write(idempotencyKey, legs, "POSTED");
+    }
+
+    private LedgerPosting write(String idempotencyKey, List<LedgerLeg> legs, String status) {
         ObjectNode transaction = json.createObjectNode();
         transaction.put("externalReference", idempotencyKey);
         transaction.put("requestId", idempotencyKey);
@@ -84,7 +88,7 @@ public final class HttpLedgerAdapter implements LedgerPort {
         transaction.put("valueDate", now);
         transaction.put("bookingDate", now);
         transaction.put("transactionType", "TRANSFER");
-        transaction.put("transactionStatus", "POSTED");
+        transaction.put("transactionStatus", status);
         transaction.put("totalAmount", legs.get(0).amount());
         transaction.put("currency", legs.get(0).currency());
         transaction.put("description", "Payment movement");
@@ -118,6 +122,30 @@ public final class HttpLedgerAdapter implements LedgerPort {
             }
         }
         return new LedgerPosting(transactionId, idempotencyKey, legs.get(0).currency(), List.copyOf(legs));
+    }
+
+    @Override
+    public LedgerPosting hold(String idempotencyKey, List<LedgerLeg> legs) {
+        Optional<LedgerPosting> existing = findByIdempotencyKey(idempotencyKey);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        return write(idempotencyKey, legs, "PENDING");
+    }
+
+    @Override
+    public LedgerPosting confirmHold(String idempotencyKey) {
+        Optional<LedgerPosting> existing = findByIdempotencyKey(idempotencyKey);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+        throw new PaymentFlowException(PaymentFailure.UNBALANCED_POSTING,
+                "The ledger has no hold to confirm for " + idempotencyKey + ".");
+    }
+
+    @Override
+    public void releaseHold(String idempotencyKey) {
+        findByIdempotencyKey(idempotencyKey).ifPresent(posting -> reverse(posting, idempotencyKey + ":release"));
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class SandboxLedgerAdapter implements LedgerPort {
 
     private final ConcurrentHashMap<String, LedgerPosting> byKey = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LedgerPosting> holds = new ConcurrentHashMap<>();
 
     @Override
     public Optional<LedgerPosting> findByIdempotencyKey(String idempotencyKey) {
@@ -63,6 +64,45 @@ public final class SandboxLedgerAdapter implements LedgerPort {
             flipped.add(new LedgerLeg(leg.accountId(), leg.accountSpaceId(), leg.side().opposite(), leg.amount(), leg.currency()));
         }
         return post(reversalKey, flipped);
+    }
+
+    @Override
+    public LedgerPosting hold(String idempotencyKey, List<LedgerLeg> legs) {
+        LedgerPosting posted = byKey.get(idempotencyKey);
+        if (posted != null) {
+            return posted;
+        }
+        LedgerPosting existing = holds.get(idempotencyKey);
+        if (existing != null) {
+            return existing;
+        }
+        validate(legs);
+        LedgerPosting hold = new LedgerPosting(UUID.randomUUID(), idempotencyKey, legs.get(0).currency(), List.copyOf(legs));
+        LedgerPosting raced = holds.putIfAbsent(idempotencyKey, hold);
+        return raced == null ? hold : raced;
+    }
+
+    @Override
+    public LedgerPosting confirmHold(String idempotencyKey) {
+        LedgerPosting posted = byKey.get(idempotencyKey);
+        if (posted != null) {
+            return posted;
+        }
+        LedgerPosting hold = holds.remove(idempotencyKey);
+        if (hold == null) {
+            throw new PaymentFlowException(PaymentFailure.UNBALANCED_POSTING, "No ledger hold exists for " + idempotencyKey + ".");
+        }
+        LedgerPosting raced = byKey.putIfAbsent(idempotencyKey, hold);
+        return raced == null ? hold : raced;
+    }
+
+    @Override
+    public void releaseHold(String idempotencyKey) {
+        holds.remove(idempotencyKey);
+    }
+
+    public boolean holding(String idempotencyKey) {
+        return holds.containsKey(idempotencyKey);
     }
 
     public List<LedgerPosting> postings() {

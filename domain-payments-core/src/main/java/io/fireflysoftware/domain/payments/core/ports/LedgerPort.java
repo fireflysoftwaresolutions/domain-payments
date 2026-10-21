@@ -33,4 +33,19 @@ public interface LedgerPort {
     LedgerPosting post(String idempotencyKey, List<LedgerLeg> legs);
 
     LedgerPosting reverse(LedgerPosting original, String reversalKey);
+
+    /**
+     * Reserves a balanced pair. The hold is not a confirmed posting.
+     */
+    LedgerPosting hold(String idempotencyKey, List<LedgerLeg> legs);
+
+    /**
+     * Turns a hold into the confirmed posting. A second call returns the same posting.
+     */
+    LedgerPosting confirmHold(String idempotencyKey);
+
+    /**
+     * Drops a hold. A second call does nothing.
+     */
+    void releaseHold(String idempotencyKey);
 }

@@ -34,6 +34,29 @@ public record MovementResult(
         BigDecimal amount,
         String currency,
         LedgerPosting posting,
-        LedgerPosting reversal
+        LedgerPosting reversal,
+        PaymentPhase phase,
+        UUID challengeId,
+        String challengeValue
 ) {
+
+    public MovementResult(UUID paymentId,
+                          PaymentStatus status,
+                          PaymentScheme scheme,
+                          MovementRoute route,
+                          String idempotencyKey,
+                          String thirdPartyReference,
+                          boolean thirdPartySynced,
+                          String syncReference,
+                          PaymentFailure failure,
+                          UUID suspenseAccountId,
+                          UUID nostroAccountId,
+                          BigDecimal amount,
+                          String currency,
+                          LedgerPosting posting,
+                          LedgerPosting reversal) {
+        this(paymentId, status, scheme, route, idempotencyKey, thirdPartyReference, thirdPartySynced,
+                syncReference, failure, suspenseAccountId, nostroAccountId, amount, currency, posting, reversal,
+                null, null, null);
+    }
 }
