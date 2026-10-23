@@ -17,6 +17,8 @@
 package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
+import io.fireflysoftware.domain.payments.sca.ChallengeDeliveryPort;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
 import io.fireflysoftware.domain.payments.sca.SdkCoreScaClient;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
@@ -44,6 +46,7 @@ import io.fireflysoftware.domain.payments.infra.LibraryPspAdapter;
 import io.fireflysoftware.psps.adapter.ports.PaymentPort;
 import io.fireflysoftware.psps.adapter.ports.PayoutPort;
 import io.fireflysoftware.psps.adapter.ports.RefundPort;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -65,14 +68,18 @@ public class PaymentsWiring {
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "sandbox", matchIfMissing = true)
-    ScaChallengeService sandboxSca(@Value("${firefly.payments.sca-base-url}") String baseUrl) {
-        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), new SandboxChallengeDeliveryAdapter());
+    ScaChallengeService sandboxSca() {
+        return new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter());
     }
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "live")
-    ScaChallengeService liveSca(@Value("${firefly.payments.sca-base-url}") String baseUrl) {
-        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), new SandboxChallengeDeliveryAdapter());
+    ScaChallengeService liveSca(@Value("${firefly.payments.sca-base-url}") String baseUrl,
+                              ChallengeDeliveryPort delivery) {
+        if (SandboxChallengeDeliveryAdapter.class.isAssignableFrom(AopProxyUtils.ultimateTargetClass(delivery))) {
+            throw new IllegalStateException("Live payments require a non-sandbox challenge delivery adapter.");
+        }
+        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), delivery);
     }
 
     @Bean

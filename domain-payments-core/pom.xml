@@ -14,6 +14,8 @@
     <name>domain-payments-core</name>
 
     <dependencies>
+        <dependency><groupId>org.fireflyframework</groupId><artifactId>fireflyframework-cqrs</artifactId></dependency>
+        <dependency><groupId>org.fireflyframework</groupId><artifactId>fireflyframework-security-api</artifactId></dependency>
         <dependency>
             <groupId>io.fireflysoftware</groupId>
             <artifactId>domain-payments-interfaces</artifactId>
@@ -26,7 +28,7 @@
         <dependency>
             <groupId>org.fireflyframework</groupId>
             <artifactId>fireflyframework-orchestration</artifactId>
-            <version>26.10.20</version>
+            <version>26.10.22</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

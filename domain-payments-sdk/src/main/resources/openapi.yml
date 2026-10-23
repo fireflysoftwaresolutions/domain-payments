@@ -1,37 +1,241 @@
 openapi: 3.0.1
 info:
-  title: domain-payments
-  version: 26.10.6
+  title: domain-payments API
+  description: Durable payment orchestration domain
+  contact:
+    name: Development Team
+    url: https://getfirefly.io
+    email: developers@getfirefly.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  version: 1.0.0
 servers:
-- url: http://localhost:8092
+- url: http://localhost:18080
+  description: Generated server url
 tags:
 - name: Payments
-  description: Try, confirm, and cancel a payment
+  description: "Try, confirm, and cancel a payment"
 paths:
-  /api/v1/payments/tries:
+  /api/v1/tenants/{tenant}/internal-payments:
     post:
       tags:
-      - Payments
-      operationId: tryPayment
+      - ManagedPaymentJourneys
+      operationId: createManagedPaymentJourney
       parameters:
-      - name: X-Idempotency-Key
-        in: header
-        required: false
+      - name: tenant
+        in: path
+        required: true
         schema:
           type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MovementCommand"
+              $ref: "#/components/schemas/Create"
+        required: true
       responses:
         "201":
-          description: Payment reserved
+          description: New instruction accepted; financial state is explicit in receipt
           content:
-            application/json:
+            '*/*':
               schema:
-                $ref: "#/components/schemas/MovementResult"
+                $ref: "#/components/schemas/View"
+        "200":
+          description: Current authorized replay
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: Trusted current bearer required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact resource authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment visible to current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: Immutable intent or current state conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required peer or delegated authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/recovery:
+    post:
+      tags:
+      - ManagedPaymentJourneys
+      operationId: recoverManagedPaymentJourney
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recovery"
+        required: true
+      responses:
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "202":
+          description: Recovery retained with pending or uncertain financial effect
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: Trusted current bearer required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact resource authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment visible to current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: Immutable intent or current state conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required peer or delegated authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/decisions:
+    post:
+      tags:
+      - ManagedPaymentJourneys
+      operationId: decideManagedPaymentJourney
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Decision"
+        required: true
+      responses:
+        "200":
+          description: Current authorized receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "202":
+          description: Decision retained with pending or uncertain financial effect
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "400":
+          description: Invalid or unsupported payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: Trusted current bearer required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact resource authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment visible to current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: Immutable intent or current state conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required peer or delegated authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+      x-disable-idempotency: true
   /api/v1/payments/{paymentId}/confirmations:
     post:
       tags:
@@ -46,20 +250,24 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Confirmation"
+        required: true
       responses:
         "200":
-          description: Payment confirmed
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/MovementResult"
   /api/v1/payments/{paymentId}/cancellations:
@@ -76,16 +284,415 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
       responses:
         "200":
-          description: Payment cancelled
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/MovementResult"
+  /api/v1/payments/tries:
+    post:
+      tags:
+      - Payments
+      operationId: tryPayment
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovementCommand"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MovementResult"
+  /api/v1/payment-records/standing-orders:
+    post:
+      tags:
+      - Payment Records
+      operationId: runStandingOrder
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StandingOrderBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecordedId"
+  /api/v1/payment-records/direct-debits:
+    post:
+      tags:
+      - Payment Records
+      operationId: createDirectDebit
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectDebitBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecordedId"
+  /api/orchestration/workflows/{workflowId}/start:
+    post:
+      tags:
+      - workflow-controller
+      operationId: startWorkflow
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartExecutionRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/workflows/instances/{correlationId}/suspend:
+    post:
+      tags:
+      - workflow-controller
+      operationId: suspendWorkflow
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: reason
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/workflows/instances/{correlationId}/signal/{signalName}:
+    post:
+      tags:
+      - workflow-controller
+      operationId: deliverSignal
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: signalName
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SignalResult"
+  /api/orchestration/workflows/instances/{correlationId}/resume:
+    post:
+      tags:
+      - workflow-controller
+      operationId: resumeWorkflow
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/workflows/instances/{correlationId}/cancel:
+    post:
+      tags:
+      - workflow-controller
+      operationId: cancelWorkflow
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}:
+    get:
+      tags:
+      - ManagedPaymentJourneys
+      operationId: getManagedPaymentJourney
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Invalid or unsupported payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "401":
+          description: Trusted current bearer required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "403":
+          description: Current action or exact resource authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "404":
+          description: No payment visible to current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "409":
+          description: Immutable intent or current state conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "503":
+          description: Required peer or delegated authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+        "200":
+          description: Current authorized financial receipt
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/View"
+      security:
+      - managedPaymentBearer: []
+  /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history:
+    get:
+      tags:
+      - ManagedPaymentJourneys
+      operationId: getManagedPaymentJourneyHistory
+      parameters:
+      - name: tenant
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: afterVersion
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          default: -1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 25
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Invalid or unsupported payment input
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "401":
+          description: Trusted current bearer required
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "403":
+          description: Current action or exact resource authority denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "404":
+          description: No payment visible to current authority
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "409":
+          description: Immutable intent or current state conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "503":
+          description: Required peer or delegated authority unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+        "200":
+          description: Bounded current-authorized retained business timeline
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+      security:
+      - managedPaymentBearer: []
   /api/v1/payments/{paymentId}:
     get:
       tags:
@@ -100,64 +707,20 @@ paths:
           format: uuid
       - name: X-Idempotency-Key
         in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
         required: false
         schema:
           type: string
       responses:
         "200":
-          description: Payment status
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/MovementResult"
-  /api/v1/payment-records/standing-orders:
-    post:
-      tags:
-      - Payment Records
-      operationId: runStandingOrder
-      parameters:
-      - name: X-Idempotency-Key
-        in: header
-        required: false
-        schema:
-          type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/StandingOrderBody"
-      responses:
-        "200":
-          description: Standing order run recorded
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecordedId"
-  /api/v1/payment-records/direct-debits:
-    post:
-      tags:
-      - Payment Records
-      operationId: createDirectDebit
-      parameters:
-      - name: X-Idempotency-Key
-        in: header
-        required: false
-        schema:
-          type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DirectDebitBody"
-      responses:
-        "200":
-          description: Direct debit mandate recorded
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecordedId"
   /api/v1/payment-records/standing-orders/{runId}:
     get:
       tags:
@@ -172,11 +735,12 @@ paths:
           format: uuid
       responses:
         "200":
-          description: Standing order run
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/StandingOrderView"
+      x-disable-idempotency: true
   /api/v1/payment-records/direct-debits/{mandateId}:
     get:
       tags:
@@ -191,18 +755,628 @@ paths:
           format: uuid
       responses:
         "200":
-          description: Direct debit mandate
+          description: OK
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/DirectDebitView"
+      x-disable-idempotency: true
+  /api/orchestration/workflows:
+    get:
+      tags:
+      - workflow-controller
+      operationId: listWorkflows
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkflowSummary"
+  /api/orchestration/workflows/{workflowId}:
+    get:
+      tags:
+      - workflow-controller
+      operationId: getWorkflow
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkflowDetail"
+  /api/orchestration/workflows/{workflowId}/topology:
+    get:
+      tags:
+      - workflow-controller
+      operationId: getTopology
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+  /api/orchestration/workflows/instances:
+    get:
+      tags:
+      - workflow-controller
+      operationId: listInstances
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - RUNNING
+          - WAITING
+          - SUSPENDED
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+          - TIMED_OUT
+          - TRYING
+          - CONFIRMING
+          - CONFIRMED
+          - CANCELING
+          - CANCELED
+          - COMPENSATING
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/workflows/instances/{correlationId}:
+    get:
+      tags:
+      - workflow-controller
+      operationId: getInstance
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/workflows/instances/{correlationId}/timers:
+    get:
+      tags:
+      - workflow-controller
+      operationId: listTimers
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimerEntry"
+  /api/orchestration/executions:
+    get:
+      tags:
+      - orchestration-controller
+      operationId: listExecutions
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - RUNNING
+          - WAITING
+          - SUSPENDED
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+          - TIMED_OUT
+          - TRYING
+          - CONFIRMING
+          - CONFIRMED
+          - CANCELING
+          - CANCELED
+          - COMPENSATING
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/executions/{id}:
+    get:
+      tags:
+      - orchestration-controller
+      operationId: getExecution
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExecutionSummaryDto"
+  /api/orchestration/dlq:
+    get:
+      tags:
+      - dead-letter-controller
+      operationId: listEntries
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeadLetterEntryDto"
+  /api/orchestration/dlq/count:
+    get:
+      tags:
+      - dead-letter-controller
+      operationId: count
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /api/orchestration/workflows/instances/{correlationId}/timers/{timerId}:
+    delete:
+      tags:
+      - workflow-controller
+      operationId: cancelTimer
+      parameters:
+      - name: correlationId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: timerId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
+  /api/orchestration/dlq/{id}:
+    delete:
+      tags:
+      - dead-letter-controller
+      operationId: deleteEntry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Idempotency-Key
+        in: header
+        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
+          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
+          \ and namespace; changed input returns 409. Business effects require durable\
+          \ application idempotency."
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
 components:
   schemas:
+    Create:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        sourceAccountId:
+          type: string
+          format: uuid
+        destinationAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        ttlSeconds:
+          type: integer
+          format: int32
+        customerNotAfterEpochMillis:
+          type: integer
+          format: int64
+      additionalProperties: false
+    View:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        createActionId:
+          type: string
+          format: uuid
+        tenant:
+          type: string
+        sourceAccountId:
+          type: string
+          format: uuid
+        destinationAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+        currencyScale:
+          type: integer
+          format: int32
+        currencyPolicy:
+          type: string
+        ttlSeconds:
+          type: integer
+          format: int32
+        customerNotAfterEpochMillis:
+          type: integer
+          format: int64
+        notAfterEpochMillis:
+          type: integer
+          format: int64
+        initiator:
+          type: string
+        state:
+          type: string
+          enum:
+          - RECEIVED
+          - RESERVING
+          - RESERVED
+          - COMMITTING
+          - CANCELLING
+          - COMPLETED
+          - REVERSED
+          - CANCELLED
+          - EXPIRED
+          - RECOVERY_REQUIRED
+        version:
+          type: integer
+          format: int64
+        reservationId:
+          type: string
+          format: uuid
+        postingId:
+          type: string
+          format: uuid
+        reversalId:
+          type: string
+          format: uuid
+        absenceReceiptId:
+          type: string
+          format: uuid
+        ledgerVersion:
+          type: integer
+          format: int64
+        observedAt:
+          type: string
+          format: date-time
+        pendingEffectId:
+          type: string
+          format: uuid
+        recoveryCode:
+          type: string
+        ledgerState:
+          type: string
+        reservationExpiresAt:
+          type: string
+          format: date-time
+    Recovery:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Decision:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - CONFIRM
+          - CANCEL
+        expectedVersion:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Confirmation:
+      type: object
+      properties:
+        response:
+          type: string
+    LedgerLeg:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        accountSpaceId:
+          type: string
+          format: uuid
+        side:
+          type: string
+          enum:
+          - DEBIT
+          - CREDIT
+        amount:
+          type: number
+        currency:
+          type: string
+    LedgerPosting:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+        currency:
+          type: string
+        legs:
+          type: array
+          items:
+            $ref: "#/components/schemas/LedgerLeg"
+    MovementResult:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - INITIATED
+          - COMPLETED
+          - FAILED
+          - UNMATCHED
+          - CANCELLED
+        scheme:
+          type: string
+          enum:
+          - INTERNAL_TRANSFER
+          - SPACE_TRANSFER
+          - DOMESTIC_OUTBOUND
+          - INTERNATIONAL_OUTBOUND
+          - PSP_PAYOUT
+          - RAIL_INBOUND
+          - PSP_INBOUND
+        route:
+          type: string
+          enum:
+          - INTERNAL_BOOK
+          - OUTBOUND_RAIL
+          - OUTBOUND_PSP
+          - INBOUND_RAIL
+          - INBOUND_PSP
+        idempotencyKey:
+          type: string
+        thirdPartyReference:
+          type: string
+        thirdPartySynced:
+          type: boolean
+        syncReference:
+          type: string
+        failure:
+          type: string
+          enum:
+          - VALIDATION
+          - LIMIT_EXCEEDED
+          - CURRENCY_NOT_IN_MASTER
+          - CURRENCY_PAIR_NOT_CONFIGURED
+          - SPACE_TYPE_NOT_CONFIGURED
+          - ROUTE_NOT_CONFIGURED
+          - UNBALANCED_POSTING
+          - POSITION_FAILED
+          - SYNC_REJECTED
+          - RECORD_FAILED
+          - COMPENSATED
+          - NOT_FOUND
+        suspenseAccountId:
+          type: string
+          format: uuid
+        nostroAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          type: string
+        posting:
+          $ref: "#/components/schemas/LedgerPosting"
+        reversal:
+          $ref: "#/components/schemas/LedgerPosting"
+        phase:
+          type: string
+          enum:
+          - TRYING
+          - CONFIRMED
+          - CANCELLED
+        challengeId:
+          type: string
+          format: uuid
+        challengeValue:
+          type: string
     MovementCommand:
       type: object
       properties:
         scheme:
           type: string
+          enum:
+          - INTERNAL_TRANSFER
+          - SPACE_TRANSFER
+          - DOMESTIC_OUTBOUND
+          - INTERNATIONAL_OUTBOUND
+          - PSP_PAYOUT
+          - RAIL_INBOUND
+          - PSP_INBOUND
         idempotencyKey:
           type: string
         amount:
@@ -240,83 +1414,6 @@ components:
           type: string
         thirdPartyReference:
           type: string
-    Confirmation:
-      type: object
-      properties:
-        response:
-          type: string
-    MovementResult:
-      type: object
-      properties:
-        paymentId:
-          type: string
-          format: uuid
-        status:
-          type: string
-        scheme:
-          type: string
-        route:
-          type: string
-        idempotencyKey:
-          type: string
-        thirdPartyReference:
-          type: string
-        thirdPartySynced:
-          type: boolean
-        syncReference:
-          type: string
-        failure:
-          type: string
-        suspenseAccountId:
-          type: string
-          format: uuid
-        nostroAccountId:
-          type: string
-          format: uuid
-        amount:
-          type: number
-        currency:
-          type: string
-        posting:
-          $ref: "#/components/schemas/LedgerPosting"
-        reversal:
-          $ref: "#/components/schemas/LedgerPosting"
-        phase:
-          type: string
-        challengeId:
-          type: string
-          format: uuid
-        challengeValue:
-          type: string
-    LedgerPosting:
-      type: object
-      properties:
-        transactionId:
-          type: string
-          format: uuid
-        idempotencyKey:
-          type: string
-        currency:
-          type: string
-        legs:
-          type: array
-          items:
-            $ref: "#/components/schemas/LedgerLeg"
-    LedgerLeg:
-      type: object
-      properties:
-        accountId:
-          type: string
-          format: uuid
-        accountSpaceId:
-          type: string
-          format: uuid
-        side:
-          type: string
-        amount:
-          type: number
-        currency:
-          type: string
     StandingOrderBody:
       type: object
       properties:
@@ -330,6 +1427,12 @@ components:
         valueDate:
           type: string
           format: date
+    RecordedId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
     DirectDebitBody:
       type: object
       properties:
@@ -345,12 +1448,113 @@ components:
           type: string
         reference:
           type: string
-    RecordedId:
+    StartExecutionRequest:
       type: object
       properties:
-        id:
+        input:
+          type: object
+          additionalProperties:
+            type: object
+        correlationId:
+          type: string
+        triggeredBy:
+          type: string
+        dryRun:
+          type: boolean
+    ExecutionSummaryDto:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        executionName:
+          type: string
+        pattern:
+          type: string
+          enum:
+          - WORKFLOW
+          - SAGA
+          - TCC
+        status:
+          type: string
+          enum:
+          - PENDING
+          - RUNNING
+          - WAITING
+          - SUSPENDED
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+          - TIMED_OUT
+          - TRYING
+          - CONFIRMING
+          - CONFIRMED
+          - CANCELING
+          - CANCELED
+          - COMPENSATING
+        startedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    SignalResult:
+      type: object
+      properties:
+        delivered:
+          type: boolean
+        resumed:
+          type: boolean
+        resumedStepId:
+          type: string
+        correlationId:
+          type: string
+        signalName:
+          type: string
+    HistoryEvent:
+      type: object
+      properties:
+        version:
+          type: integer
+          format: int64
+        type:
+          type: string
+        actor:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        actionId:
           type: string
           format: uuid
+        effectId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - RECEIVED
+          - RESERVING
+          - RESERVED
+          - COMMITTING
+          - CANCELLING
+          - COMPLETED
+          - REVERSED
+          - CANCELLED
+          - EXPIRED
+          - RECOVERY_REQUIRED
+        postingId:
+          type: string
+          format: uuid
+        reversalId:
+          type: string
+          format: uuid
+    HistoryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryEvent"
     StandingOrderView:
       type: object
       properties:
@@ -387,3 +1591,95 @@ components:
           type: string
         reference:
           type: string
+    WorkflowSummary:
+      type: object
+      properties:
+        workflowId:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        stepCount:
+          type: integer
+          format: int32
+    StepSummary:
+      type: object
+      properties:
+        stepId:
+          type: string
+        name:
+          type: string
+        dependsOn:
+          type: array
+          items:
+            type: string
+        order:
+          type: integer
+          format: int32
+    WorkflowDetail:
+      type: object
+      properties:
+        workflowId:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        triggerMode:
+          type: string
+        timeoutMs:
+          type: integer
+          format: int64
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/StepSummary"
+    TimerEntry:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        timerId:
+          type: string
+        fireAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+        ready:
+          type: boolean
+    DeadLetterEntryDto:
+      type: object
+      properties:
+        id:
+          type: string
+        executionName:
+          type: string
+        correlationId:
+          type: string
+        pattern:
+          type: string
+          enum:
+          - WORKFLOW
+          - SAGA
+          - TCC
+        stepId:
+          type: string
+        errorMessage:
+          type: string
+        retryCount:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+  securitySchemes:
+    managedPaymentBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

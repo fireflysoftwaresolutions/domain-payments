@@ -19,6 +19,9 @@ package io.fireflysoftware.domain.payments.web;
 import io.fireflysoftware.core.banking.payments.sdk.model.DirectDebitMandateDTO;
 import io.fireflysoftware.core.banking.payments.sdk.model.StandingOrderRunDTO;
 import io.fireflysoftware.domain.payments.infra.PaymentInstructionRecords;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.fireflyframework.web.idempotency.annotation.DisableIdempotency;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +36,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/payment-records")
+@Tag(name = "Payment Records")
 public class PaymentRecordsController {
 
     private final PaymentInstructionRecords records;
@@ -42,12 +46,14 @@ public class PaymentRecordsController {
     }
 
     @PostMapping("/standing-orders")
+    @Operation(operationId = "runStandingOrder")
     public Mono<RecordedId> standingOrder(@RequestBody StandingOrderBody body) {
         return records.runStandingOrder(body.paymentScheduleId(), body.amount(), body.currency(), body.valueDate())
                 .map(RecordedId::new);
     }
 
     @PostMapping("/direct-debits")
+    @Operation(operationId = "createDirectDebit")
     public Mono<RecordedId> directDebit(@RequestBody DirectDebitBody body) {
         return records.createDirectDebit(body.debtorAccountId(), body.creditorPartyId(), body.amountLimit(),
                         body.currency(), body.reference())
@@ -55,11 +61,15 @@ public class PaymentRecordsController {
     }
 
     @GetMapping("/standing-orders/{runId}")
+    @Operation(operationId = "readStandingOrder")
+    @DisableIdempotency
     public Mono<StandingOrderView> standingOrder(@PathVariable UUID runId) {
         return records.standingOrder(runId).map(PaymentRecordsController::standingOrderView);
     }
 
     @GetMapping("/direct-debits/{mandateId}")
+    @Operation(operationId = "readDirectDebit")
+    @DisableIdempotency
     public Mono<DirectDebitView> directDebit(@PathVariable UUID mandateId) {
         return records.directDebit(mandateId).map(PaymentRecordsController::directDebitView);
     }
