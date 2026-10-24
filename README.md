@@ -27,7 +27,7 @@ core-banking-payments owns instruction records; the domain does not keep a secon
 | --- | --- |
 | [PaymentRecordsController](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentRecordsController.java) | `GET /api/v1/payment-records/standing-orders/{runId}`; `GET /api/v1/payment-records/direct-debits/{mandateId}`; `POST /api/v1/payment-records/standing-orders`; 1 more declarations |
 | [PaymentsController](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java) | `GET /api/v1/payments/{paymentId}`; `POST /api/v1/payments/tries`; `POST /api/v1/payments/{paymentId}/confirmations`; 1 more declarations |
-| [ManagedPaymentsController](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}`; `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history`; `POST /api/v1/tenants/{tenant}/internal-payments`; 2 more declarations |
+| [ManagedPaymentsController](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}`; `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history`; `POST /api/v1/tenants/{tenant}/internal-payments`; 2 more declarations |
 
 The complete [operation reference](docs/openplatform/reference.md#http-operations) lists each mapping and its owning method. These are source declarations; conditional beans, inherited controllers, security filters, and deployment routing can change the effective runtime API.
 
@@ -117,11 +117,11 @@ The legacy ledger SDK adapter now uses dedicated atomic LedgerPostingsApi aggreg
 
 | Data type | Declared fields (selection) |
 | --- | --- |
-| [CreateManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/CreateManagedPaymentCommand.java) | `tenant`, `input`, `commandId` |
-| [DecideManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/DecideManagedPaymentCommand.java) | `tenant`, `paymentId`, `input`, `commandId` |
-| [GetManagedPaymentHistoryQuery](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHistoryQuery.java) | `tenant`, `paymentId`, `afterVersion`, `limit`, `queryId` |
-| [GetManagedPaymentQuery](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentQuery.java) | `tenant`, `paymentId`, `queryId` |
-| [RecoverManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/RecoverManagedPaymentCommand.java) | `tenant`, `paymentId`, `input`, `commandId` |
+| [CreateManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/CreateManagedPaymentCommand.java) | `tenant`, `input`, `commandId` |
+| [DecideManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/DecideManagedPaymentCommand.java) | `tenant`, `paymentId`, `input`, `commandId` |
+| [GetManagedPaymentHistoryQuery](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHistoryQuery.java) | `tenant`, `paymentId`, `afterVersion`, `limit`, `queryId` |
+| [GetManagedPaymentQuery](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentQuery.java) | `tenant`, `paymentId`, `queryId` |
+| [RecoverManagedPaymentCommand](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/RecoverManagedPaymentCommand.java) | `tenant`, `paymentId`, `input`, `commandId` |
 | [LedgerLeg](domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/LedgerLeg.java) | `accountId`, `accountSpaceId`, `side`, `amount`, `currency` |
 | [LedgerPosting](domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/LedgerPosting.java) | `transactionId`, `idempotencyKey`, `currency`, `legs` |
 | [MasterData](domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/MasterData.java) | `currencies` |
@@ -138,8 +138,8 @@ Examples of locally enforced failure or access behavior:
 
 | Declared check or failure | Implementation |
 | --- | --- |
-| `new ResponseStatusException(HttpStatusCode.valueOf(code), reason);` | [ManagedPaymentContext](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentContext.java) |
-| `new IllegalArgumentException("BOUNDED_MANAGED_RECOVERY_CONFIGURATION_REQUIRED");` | [ManagedPaymentRecoveryWorker](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorker.java) |
+| `new ResponseStatusException(HttpStatusCode.valueOf(code), reason);` | [ManagedPaymentContext](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentContext.java) |
+| `new IllegalArgumentException("BOUNDED_MANAGED_RECOVERY_CONFIGURATION_REQUIRED");` | [ManagedPaymentRecoveryWorker](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorker.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Payment routing is not configured.");` | [SchemeRouter](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/routing/SchemeRouter.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,` | [SdkPaymentConfigurationAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentConfigurationAdapter.java) |
 | `new PaymentFlowException(PaymentFailure.POSITION_FAILED, "The customer credit was rejected.");` | [SandboxAccountPositionAdapter](domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxAccountPositionAdapter.java) |
@@ -171,8 +171,8 @@ Actual bean selection conditions:
 | `name = "firefly.payments.mode", havingValue = "live"` | [PaymentsWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
 | `name = "firefly.payments.configuration", havingValue = "live"` | [PaymentsWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
 | `name = "firefly.payments.configuration", havingValue = "live"` | [PaymentsWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
-| `name = "managed-payments.recovery.enabled", havingValue = "true"` | [ManagedPaymentWorkerWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java) |
-| `name = "managed-payments.recovery.enabled", havingValue = "true"` | [ManagedPaymentWorkerWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java) |
+| `name = "managed-payments.recovery.enabled", havingValue = "true"` | [ManagedPaymentWorkerWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java) |
+| `name = "managed-payments.recovery.enabled", havingValue = "true"` | [ManagedPaymentWorkerWiring](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java) |
 
 Implemented adapter classes:
 
@@ -196,16 +196,16 @@ Implemented adapter classes:
 | [SdkPaymentConfigurationAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentConfigurationAdapter.java) | `PaymentConfigurationPort`; `catalog` | Inspect implementation and selected wiring |
 | [SdkPaymentMasterAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentMasterAdapter.java) | `PaymentMasterPort`; `current` | Inspect implementation and selected wiring |
 | [SdkPaymentRecordAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentRecordAdapter.java) | `PaymentRecordPort`; `findById`, `findByIdempotencyKey`, `findByThirdPartyReference`, `save` | Inspect implementation and selected wiring |
-| [ManagedPaymentDelegationAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapter.java) | `PaymentDelegationPort`; `token` | Inspect implementation and selected wiring |
-| [OAuthManagedPaymentWorkerActorAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapter.java) | `ManagedPaymentWorkerActorPort`; `current` | Inspect implementation and selected wiring |
-| [SdkManagedFundsAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapter.java) | `ManagedFundsPort`; `reserve`, `act`, `observe` | Inspect implementation and selected wiring |
-| [SdkManagedPaymentCoreAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapter.java) | `ManagedPaymentCorePort`; `create`, `read`, `claim`, `acknowledge`, `failure` | Inspect implementation and selected wiring |
+| [ManagedPaymentDelegationAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapter.java) | `PaymentDelegationPort`; `token` | Inspect implementation and selected wiring |
+| [OAuthManagedPaymentWorkerActorAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapter.java) | `ManagedPaymentWorkerActorPort`; `current` | Inspect implementation and selected wiring |
+| [SdkManagedFundsAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapter.java) | `ManagedFundsPort`; `reserve`, `act`, `observe` | Inspect implementation and selected wiring |
+| [SdkManagedPaymentCoreAdapter](domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapter.java) | `ManagedPaymentCorePort`; `create`, `read`, `claim`, `acknowledge`, `failure` | Inspect implementation and selected wiring |
 
 Implement and register the existing typed rail/PSP/delivery ports, select both transaction and configuration modes explicitly, and configure authenticated core/provider endpoints. Real challenge delivery must preserve identity and must not return its secret OTP in the public challengeValue. Missing live delivery prevents startup. Provider timeout/uncertainty, durable recovery and settlement require separate qualification; the no-socket sandbox is never a live fallback.
 
 ## Configuration and local setup
 
-Runtime configuration sources: [openapi.yml](domain-payments-sdk/src/main/resources/openapi.yml), [ManagedPaymentWorkerWiring.java](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java), [application.yaml](domain-payments-web/src/main/resources/application.yaml).
+Runtime configuration sources: [openapi.yml](domain-payments-sdk/src/main/resources/openapi.yml), [ManagedPaymentWorkerWiring.java](domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java), [application.yaml](domain-payments-web/src/main/resources/application.yaml).
 
 | Environment variable or property | Declared fallback |
 | --- | --- |
@@ -276,14 +276,14 @@ Recover native instructions from payment core under fresh current authority; pre
 
 Existing test scenarios provide concrete starting points for failure reproduction:
 
-- `runtime` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `createUsesActualInjectedSagaAndCoreReceiptWithoutSessionMap` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `noTransientActorCannotBorrowNativeContext` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `missingNativeContextIsDeniedBeforePorts` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `mismatchedNativeActorCannotBorrowTrustedBearer` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `failedCommitNeverAutomaticallyReleasesAndKeepsStableParticipant` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `currentDecisionConflictIsNotReplacedByAReadSuccess` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- `mismatchedCoreCreateReceiptCannotDispatchDifferentImmutableIntent` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
+- `runtime` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `createUsesActualInjectedSagaAndCoreReceiptWithoutSessionMap` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `noTransientActorCannotBorrowNativeContext` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `missingNativeContextIsDeniedBeforePorts` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `mismatchedNativeActorCannotBorrowTrustedBearer` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `failedCommitNeverAutomaticallyReleasesAndKeepsStableParticipant` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `currentDecisionConflictIsNotReplacedByAReadSuccess` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- `mismatchedCoreCreateReceiptCannotDispatchDifferentImmutableIntent` — [ManagedPaymentFlowTest](domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
 
 ## Compatibility and validation boundaries
 

@@ -16,17 +16,17 @@ This reference is derived from checked-in source. It separates declared HTTP map
 | `POST /api/v1/payments/tries` | `public Mono<MovementResult> tryPayment(@RequestBody MovementCommand command)` | [PaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java) | Local declaration |
 | `POST /api/v1/payments/{paymentId}/confirmations` | `public Mono<MovementResult> confirm(@PathVariable UUID paymentId, @RequestBody Confirmation confirmation)` | [PaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java) | Local declaration |
 | `POST /api/v1/payments/{paymentId}/cancellations` | `public Mono<MovementResult> cancel(@PathVariable UUID paymentId)` | [PaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java) | Local declaration |
-| `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}` | `public Mono<View> read( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | Local declaration |
-| `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history` | `public Mono<HistoryPage> history( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestParam(defaultValue = "-1") long afterVersion, @RequestParam(defaultValue = "25") int limit)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | Local declaration |
-| `POST /api/v1/tenants/{tenant}/internal-payments` | `public Mono<ResponseEntity<View>> create( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @RequestBody Create input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | Local declaration |
-| `POST /api/v1/tenants/{tenant}/internal-payments/{paymentId}/decisions` | `public Mono<ResponseEntity<View>> decide( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Decision input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | Local declaration |
-| `POST /api/v1/tenants/{tenant}/internal-payments/{paymentId}/recovery` | `public Mono<ResponseEntity<View>> recover( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Recovery input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java) | Local declaration |
+| `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}` | `public Mono<View> read( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | Local declaration |
+| `GET /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history` | `public Mono<HistoryPage> history( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestParam(defaultValue = "-1") long afterVersion, @RequestParam(defaultValue = "25") int limit)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | Local declaration |
+| `POST /api/v1/tenants/{tenant}/internal-payments` | `public Mono<ResponseEntity<View>> create( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @RequestBody Create input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | Local declaration |
+| `POST /api/v1/tenants/{tenant}/internal-payments/{paymentId}/decisions` | `public Mono<ResponseEntity<View>> decide( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Decision input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | Local declaration |
+| `POST /api/v1/tenants/{tenant}/internal-payments/{paymentId}/recovery` | `public Mono<ResponseEntity<View>> recover( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Recovery input)` | [ManagedPaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java) | Local declaration |
 
 ## Data contracts
 
 ### CreateManagedPaymentCommand
 
-[CreateManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/CreateManagedPaymentCommand.java) · DTO / record / model
+[CreateManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/CreateManagedPaymentCommand.java) · DTO / record / model
 
 | Field | Java type | Validation annotations |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ This reference is derived from checked-in source. It separates declared HTTP map
 
 ### DecideManagedPaymentCommand
 
-[DecideManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/DecideManagedPaymentCommand.java) · DTO / record / model
+[DecideManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/DecideManagedPaymentCommand.java) · DTO / record / model
 
 | Field | Java type | Validation annotations |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ This reference is derived from checked-in source. It separates declared HTTP map
 
 ### GetManagedPaymentHistoryQuery
 
-[GetManagedPaymentHistoryQuery](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHistoryQuery.java) · DTO / record / model
+[GetManagedPaymentHistoryQuery](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHistoryQuery.java) · DTO / record / model
 
 | Field | Java type | Validation annotations |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ This reference is derived from checked-in source. It separates declared HTTP map
 
 ### GetManagedPaymentQuery
 
-[GetManagedPaymentQuery](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentQuery.java) · DTO / record / model
+[GetManagedPaymentQuery](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentQuery.java) · DTO / record / model
 
 | Field | Java type | Validation annotations |
 | --- | --- | --- |
@@ -69,7 +69,7 @@ This reference is derived from checked-in source. It separates declared HTTP map
 
 ### RecoverManagedPaymentCommand
 
-[RecoverManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/RecoverManagedPaymentCommand.java) · DTO / record / model
+[RecoverManagedPaymentCommand](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/RecoverManagedPaymentCommand.java) · DTO / record / model
 
 | Field | Java type | Validation annotations |
 | --- | --- | --- |
@@ -215,7 +215,7 @@ This reference is derived from checked-in source. It separates declared HTTP map
 
 ### ManagedFundsPort
 
-[ManagedFundsPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedFundsPort.java)
+[ManagedFundsPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedFundsPort.java)
 
 ```java
 record ReservationObservation( UUID operationId, UUID reservationId, String state, UUID postingId, UUID reversalId, UUID absenceReceiptId);
@@ -226,7 +226,7 @@ Mono<ReservationObservation> observe(String tenant, EffectClaim claim);
 
 ### ManagedPaymentCorePort
 
-[ManagedPaymentCorePort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentCorePort.java)
+[ManagedPaymentCorePort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentCorePort.java)
 
 ```java
 Mono<Acceptance> create(String tenant, Create input);
@@ -242,7 +242,7 @@ Flux<HistoryEvent> history(String tenant, UUID payment, long after, int limit);
 
 ### ManagedPaymentWorkerActorPort
 
-[ManagedPaymentWorkerActorPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentWorkerActorPort.java)
+[ManagedPaymentWorkerActorPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentWorkerActorPort.java)
 
 ```java
 Mono<ManagedPaymentContext.Call> current(String tenant);
@@ -250,7 +250,7 @@ Mono<ManagedPaymentContext.Call> current(String tenant);
 
 ### PaymentDelegationPort
 
-[PaymentDelegationPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/PaymentDelegationPort.java)
+[PaymentDelegationPort](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/PaymentDelegationPort.java)
 
 ```java
 Mono<String> token(String audience, String tenant, Set<UUID> accounts, Set<String> scopes);
@@ -360,19 +360,19 @@ Values below come from source placeholders. Plain YAML values and configuration-
 | `firefly.payments.payments-core-base-url` | No fallback | [PaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
 | `firefly.payments.config-base-url` | No fallback | [PaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
 | `firefly.payments.masters-base-url` | No fallback | [PaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
-| `managed-payments.security.issuer` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java) |
-| `managed-payments.security.audience` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java) |
-| `managed-payments.security.jwk-set-uri` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java) |
-| `managed-payments.allow-loopback-http` | `false` | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java) |
-| `managed-payments.security.issuer` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java) |
-| `managed-payments.security.audience` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java) |
-| `managed-payments.security.jwk-set-uri` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java) |
-| `managed-payments.delegation.mode` | `unconfigured` | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
-| `managed-payments.peers.payment-core.base-url` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
-| `managed-payments.peers.payment-core.audience` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
-| `managed-payments.allow-loopback-http` | `false` | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
-| `managed-payments.peers.ledger.base-url` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
-| `managed-payments.peers.ledger.audience` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java) |
+| `managed-payments.security.issuer` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java) |
+| `managed-payments.security.audience` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java) |
+| `managed-payments.security.jwk-set-uri` | Empty | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java) |
+| `managed-payments.allow-loopback-http` | `false` | [ManagedPaymentWorkerActorAutoConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java) |
+| `managed-payments.security.issuer` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java) |
+| `managed-payments.security.audience` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java) |
+| `managed-payments.security.jwk-set-uri` | Empty | [ManagedPaymentsSecurityConfiguration](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java) |
+| `managed-payments.delegation.mode` | `unconfigured` | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
+| `managed-payments.peers.payment-core.base-url` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
+| `managed-payments.peers.payment-core.audience` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
+| `managed-payments.allow-loopback-http` | `false` | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
+| `managed-payments.peers.ledger.base-url` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
+| `managed-payments.peers.ledger.audience` | Empty | [ManagedPaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java) |
 | `SERVER_PORT` | `8092` | [application](../../domain-payments-web/src/main/resources/application.yaml) |
 | `LEDGER_URL` | `http://localhost:8083` | [application](../../domain-payments-web/src/main/resources/application.yaml) |
 | `ACCOUNTS_CORE_URL` | `http://localhost:8080` | [application](../../domain-payments-web/src/main/resources/application.yaml) |
@@ -400,8 +400,8 @@ Values below come from source placeholders. Plain YAML values and configuration-
 
 | Declaration or failure site | Source |
 | --- | --- |
-| `new ResponseStatusException(HttpStatusCode.valueOf(code), reason);` | [ManagedPaymentContext](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentContext.java) |
-| `new IllegalArgumentException("BOUNDED_MANAGED_RECOVERY_CONFIGURATION_REQUIRED");` | [ManagedPaymentRecoveryWorker](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorker.java) |
+| `new ResponseStatusException(HttpStatusCode.valueOf(code), reason);` | [ManagedPaymentContext](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentContext.java) |
+| `new IllegalArgumentException("BOUNDED_MANAGED_RECOVERY_CONFIGURATION_REQUIRED");` | [ManagedPaymentRecoveryWorker](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorker.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, "Payment routing is not configured.");` | [SchemeRouter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/routing/SchemeRouter.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,` | [SchemeRouter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/routing/SchemeRouter.java) |
 | `new PaymentFlowException(PaymentFailure.POSITION_FAILED, "The customer credit was rejected.");` | [SandboxAccountPositionAdapter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxAccountPositionAdapter.java) |
@@ -412,22 +412,22 @@ Values below come from source placeholders. Plain YAML values and configuration-
 | `new PaymentFlowException(PaymentFailure.RECORD_FAILED, "The payments core rejected the completion write.");` | [SandboxPaymentRecordAdapter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPaymentRecordAdapter.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,` | [SandboxPspAdapter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPspAdapter.java) |
 | `new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,` | [SandboxPspAdapter](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPspAdapter.java) |
-| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED, "Try did not reserve the payment.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.NOT_FOUND, "Try did not record a payment."));` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "A cancelled payment cannot be confirmed.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.RECORD_FAILED, "Cancel did not release the payment.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "The challenge response was not accepted.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED, sync.reason());` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "An inbound payment needs a third-party reference.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "Amount must be greater than zero.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "Party, contract, and payment method identifiers are required.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.CURRENCY_PAIR_NOT_CONFIGURED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.LIMIT_EXCEEDED, "Amount exceeds the configured limit.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.SPACE_TYPE_NOT_CONFIGURED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.VALIDATION, "Currency must be a three-letter ISO code.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.CURRENCY_NOT_IN_MASTER,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
-| `new PaymentFlowException(PaymentFailure.NOT_FOUND, "Payment " + paymentId + " was not found.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java) |
+| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED, "Try did not reserve the payment.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.NOT_FOUND, "Try did not record a payment."));` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "A cancelled payment cannot be confirmed.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.RECORD_FAILED, "Cancel did not release the payment.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "The challenge response was not accepted.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.SYNC_REJECTED, sync.reason());` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "An inbound payment needs a third-party reference.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "Amount must be greater than zero.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "Party, contract, and payment method identifiers are required.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.CURRENCY_PAIR_NOT_CONFIGURED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.LIMIT_EXCEEDED, "Amount exceeds the configured limit.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.SPACE_TYPE_NOT_CONFIGURED,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.VALIDATION, "Currency must be a three-letter ISO code.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.CURRENCY_NOT_IN_MASTER,` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
+| `new PaymentFlowException(PaymentFailure.NOT_FOUND, "Payment " + paymentId + " was not found.");` | [PaymentTccHub](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java) |
 | `new IllegalStateException("core-common-sca-mgmt did not return an operation id.");` | [SdkCoreScaClient](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SdkCoreScaClient.java) |
 | `new IllegalStateException("core-common-sca-mgmt did not return a challenge code.");` | [SdkCoreScaClient](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SdkCoreScaClient.java) |
 | `new IllegalStateException("core-common-sca-mgmt returned an empty response.");` | [SdkCoreScaClient](../../domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SdkCoreScaClient.java) |
@@ -460,16 +460,16 @@ Values below come from source placeholders. Plain YAML values and configuration-
 | `new PaymentFlowException(PaymentFailure.RECORD_FAILED,` | [SdkPaymentRecordAdapter](../../domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentRecordAdapter.java) |
 | `new PaymentFlowException(PaymentFailure.RECORD_FAILED, "core-banking-payments could not be reached.");` | [SdkPaymentRecordAdapter](../../domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentRecordAdapter.java) |
 | `new PaymentFlowException(PaymentFailure.RECORD_FAILED, "Payments base URL is required.");` | [SdkPaymentRecordAdapter](../../domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentRecordAdapter.java) |
-| `new IllegalArgumentException("DEDICATED_TENANT_WORKER_REGISTRATIONS_REQUIRED");` | [OAuthManagedPaymentWorkerActorAdapter](../../domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapter.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
-| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("DEDICATED_TENANT_WORKER_REGISTRATIONS_REQUIRED");` | [OAuthManagedPaymentWorkerActorAdapter](../../domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapter.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
+| `new IllegalArgumentException("UNSUPPORTED_MANAGED_PAYMENT_FIELD");` | [ManagedPaymentContracts](../../domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java) |
 | `@ResponseStatus(HttpStatus.CREATED)` | [PaymentsController](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java) |
 | `new IllegalStateException("Live payments require a non-sandbox challenge delivery adapter.");` | [PaymentsWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java) |
-| `new IllegalArgumentException("BOUNDED_RECOVERY_INTERVAL_REQUIRED");` | [ManagedPaymentWorkerWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java) |
+| `new IllegalArgumentException("BOUNDED_RECOVERY_INTERVAL_REQUIRED");` | [ManagedPaymentWorkerWiring](../../domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java) |
 
 ## Build and dependencies
 
@@ -567,9 +567,9 @@ Coordinates: `io.fireflysoftware:domain-payments:26.10.6`. Parent: `io.fireflyso
 
 ## Test sources
 
-- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java)
-- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java)
-- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java)
+- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java)
+- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java)
+- [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java)
 - [domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHubTest.java](../../domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHubTest.java)
 - [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LedgerAtomicRuntimeIT.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LedgerAtomicRuntimeIT.java)
 - [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LibraryPaymentRailAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LibraryPaymentRailAdapterTest.java)
@@ -577,20 +577,20 @@ Coordinates: `io.fireflysoftware:domain-payments:26.10.6`. Parent: `io.fireflyso
 - [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/PaymentInstructionRecordsTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/PaymentInstructionRecordsTest.java)
 - [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterHttpTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterHttpTest.java)
 - [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterTest.java)
-- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java)
-- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java)
-- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java)
-- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java)
+- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java)
+- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java)
+- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java)
+- [domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java](../../domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java)
 - [domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/GeneratedLegacyClientsTest.java](../../domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/GeneratedLegacyClientsTest.java)
 - [domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/LegacyPaymentClientsCompatibilityTest.java](../../domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/LegacyPaymentClientsCompatibilityTest.java)
 - [domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/ManagedPaymentJourneysContractTest.java](../../domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/ManagedPaymentJourneysContractTest.java)
 - [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsControllerTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsControllerTest.java)
 - [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsWiringTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsWiringTest.java)
-- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java)
-- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java)
-- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java)
-- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java)
-- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java)
+- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java)
+- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java)
+- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java)
+- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java)
+- [domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java](../../domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java)
 - [domain-payments-web/src/test/scripts/verify-packaged-runtime.py](../../domain-payments-web/src/test/scripts/verify-packaged-runtime.py)
 
 ## CI definitions

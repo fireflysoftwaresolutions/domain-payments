@@ -14,7 +14,8 @@ import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapt
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
+import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -137,7 +138,7 @@ class LedgerAtomicRuntimeIT {
         var ledger = new SdkLedgerAdapter(baseUrl());
         var rail = new SandboxPaymentRailAdapter();
         rail.rejectOutbound(key);
-        var hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(), rail, new SandboxPspAdapter(),
+        var hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(), rail, new SandboxPspAdapter(),
                 new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         var entries = pair(new BigDecimal("25.00"));
         var command = new MovementCommand(PaymentScheme.INTERNATIONAL_OUTBOUND, key, new BigDecimal("25.00"), "EUR",

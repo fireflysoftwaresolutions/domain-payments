@@ -18,7 +18,7 @@ package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -39,9 +39,9 @@ import java.util.UUID;
 @Tag(name = "Payments", description = "Try, confirm, and cancel a payment")
 public class PaymentsController {
 
-    private final PaymentTccHub hub;
+    private final PaymentTccService hub;
 
-    public PaymentsController(PaymentTccHub hub) {
+    public PaymentsController(PaymentTccService hub) {
         this.hub = hub;
     }
 

@@ -554,15 +554,6 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: X-Idempotency-Key
-        in: header
-        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
-          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
-          \ and namespace; changed input returns 409. Business effects require durable\
-          \ application idempotency."
-        required: false
-        schema:
-          type: string
       responses:
         "400":
           description: Invalid or unsupported payment input
@@ -608,6 +599,7 @@ paths:
                 $ref: "#/components/schemas/View"
       security:
       - managedPaymentBearer: []
+      x-disable-idempotency: true
   /api/v1/tenants/{tenant}/internal-payments/{paymentId}/history:
     get:
       tags:
@@ -639,15 +631,6 @@ paths:
           type: integer
           format: int32
           default: 25
-      - name: X-Idempotency-Key
-        in: header
-        description: "Optional retry key for scoped POST, PUT, PATCH, and DELETE response\
-          \ reuse. Safe methods ignore it. Reuse requires configured trusted identity\
-          \ and namespace; changed input returns 409. Business effects require durable\
-          \ application idempotency."
-        required: false
-        schema:
-          type: string
       responses:
         "400":
           description: Invalid or unsupported payment input
@@ -693,6 +676,7 @@ paths:
                 $ref: "#/components/schemas/HistoryPage"
       security:
       - managedPaymentBearer: []
+      x-disable-idempotency: true
   /api/v1/payments/{paymentId}:
     get:
       tags:

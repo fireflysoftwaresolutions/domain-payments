@@ -20,6 +20,7 @@ import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
 import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
 import io.fireflysoftware.domain.payments.sca.ChallengeDeliveryPort;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
+import io.fireflysoftware.domain.payments.sca.impl.ScaChallengeServiceImpl;
 import io.fireflysoftware.domain.payments.sca.SdkCoreScaClient;
 import io.fireflysoftware.domain.payments.core.ports.AccountPositionPort;
 import io.fireflysoftware.domain.payments.core.ports.LedgerPort;
@@ -28,7 +29,8 @@ import io.fireflysoftware.domain.payments.core.ports.PaymentMasterPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentRailPort;
 import io.fireflysoftware.domain.payments.core.ports.PaymentRecordPort;
 import io.fireflysoftware.domain.payments.core.ports.PspPort;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
+import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxAccountPositionAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
@@ -56,20 +58,20 @@ import org.springframework.context.annotation.Configuration;
 public class PaymentsWiring {
 
     @Bean
-    PaymentTccHub paymentTccHub(LedgerPort ledger,
+    PaymentTccService paymentTccHub(LedgerPort ledger,
                                 PaymentRecordPort records,
                                 PaymentRailPort rail,
                                 PspPort psp,
                                 PaymentConfigurationPort configuration,
                                 PaymentMasterPort masters,
                                 ScaChallengeService sca) {
-        return PaymentTccHub.create(ledger, records, rail, psp, configuration, masters, sca);
+        return PaymentTccServiceImpl.create(ledger, records, rail, psp, configuration, masters, sca);
     }
 
     @Bean
     @ConditionalOnProperty(name = "firefly.payments.mode", havingValue = "sandbox", matchIfMissing = true)
     ScaChallengeService sandboxSca() {
-        return new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter());
+        return new ScaChallengeServiceImpl(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter());
     }
 
     @Bean
@@ -79,7 +81,7 @@ public class PaymentsWiring {
         if (SandboxChallengeDeliveryAdapter.class.isAssignableFrom(AopProxyUtils.ultimateTargetClass(delivery))) {
             throw new IllegalStateException("Live payments require a non-sandbox challenge delivery adapter.");
         }
-        return new ScaChallengeService(SdkCoreScaClient.at(baseUrl), delivery);
+        return new ScaChallengeServiceImpl(SdkCoreScaClient.at(baseUrl), delivery);
     }
 
     @Bean

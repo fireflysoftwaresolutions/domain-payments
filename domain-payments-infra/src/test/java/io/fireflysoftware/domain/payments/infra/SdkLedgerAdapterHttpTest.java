@@ -34,7 +34,8 @@ import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapt
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
+import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,7 @@ class SdkLedgerAdapterHttpTest {
     void actualTccProviderRejectionUsesPersistedConfirmedLegs() {
         SandboxPaymentRailAdapter rail = new SandboxPaymentRailAdapter();
         rail.rejectOutbound("rejected-payment");
-        PaymentTccHub hub = PaymentTccHub.sandbox(adapter, new SandboxPaymentRecordAdapter(), rail,
+        PaymentTccService hub = PaymentTccServiceImpl.sandbox(adapter, new SandboxPaymentRecordAdapter(), rail,
                 new SandboxPspAdapter(), new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         MovementCommand command = new MovementCommand(PaymentScheme.INTERNATIONAL_OUTBOUND, "rejected-payment", AMOUNT, "EUR",
                 UUID.fromString("10000000-0000-4000-8000-0000000000aa"),

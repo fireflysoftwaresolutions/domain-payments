@@ -235,7 +235,7 @@
         "token"
       ],
       "name": "ManagedPaymentDelegationAdapter",
-      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapter.java",
+      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapter.java",
       "synthetic": false
     },
     {
@@ -245,7 +245,7 @@
         "current"
       ],
       "name": "OAuthManagedPaymentWorkerActorAdapter",
-      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapter.java",
+      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapter.java",
       "synthetic": false
     },
     {
@@ -257,7 +257,7 @@
         "observe"
       ],
       "name": "SdkManagedFundsAdapter",
-      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapter.java",
+      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapter.java",
       "synthetic": false
     },
     {
@@ -275,7 +275,7 @@
         "history"
       ],
       "name": "SdkManagedPaymentCoreAdapter",
-      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapter.java",
+      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapter.java",
       "synthetic": false
     }
   ],
@@ -349,16 +349,16 @@
     },
     {
       "expression": "name = \"managed-payments.recovery.enabled\", havingValue = \"true\"",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java"
     },
     {
       "expression": "name = \"managed-payments.recovery.enabled\", havingValue = \"true\"",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java"
     }
   ],
   "config_files": [
     "domain-payments-sdk/src/main/resources/openapi.yml",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java",
     "domain-payments-web/src/main/resources/application.yaml"
   ],
   "docs": [
@@ -379,11 +379,11 @@
   "errors": [
     {
       "evidence": "new ResponseStatusException(HttpStatusCode.valueOf(code), reason);",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentContext.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentContext.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"BOUNDED_MANAGED_RECOVERY_CONFIGURATION_REQUIRED\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorker.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorker.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED, \"Payment routing is not configured.\");",
@@ -427,67 +427,67 @@
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.SYNC_REJECTED, \"Try did not reserve the payment.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.NOT_FOUND, \"Try did not record a payment.\"));",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"A cancelled payment cannot be confirmed.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.RECORD_FAILED, \"Cancel did not release the payment.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.SYNC_REJECTED,",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"The challenge response was not accepted.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.SYNC_REJECTED, sync.reason());",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"An inbound payment needs a third-party reference.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"Amount must be greater than zero.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"Party, contract, and payment method identifiers are required.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.CURRENCY_PAIR_NOT_CONFIGURED,",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.LIMIT_EXCEEDED, \"Amount exceeds the configured limit.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.SPACE_TYPE_NOT_CONFIGURED,",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.VALIDATION, \"Currency must be a three-letter ISO code.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.CURRENCY_NOT_IN_MASTER,",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new PaymentFlowException(PaymentFailure.NOT_FOUND, \"Payment \" + paymentId + \" was not found.\");",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java"
     },
     {
       "evidence": "new IllegalStateException(\"core-common-sca-mgmt did not return an operation id.\");",
@@ -619,31 +619,31 @@
     },
     {
       "evidence": "new IllegalArgumentException(\"DEDICATED_TENANT_WORKER_REGISTRATIONS_REQUIRED\");",
-      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapter.java"
+      "path": "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapter.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "new IllegalArgumentException(\"UNSUPPORTED_MANAGED_PAYMENT_FIELD\");",
-      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java"
+      "path": "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java"
     },
     {
       "evidence": "@ResponseStatus(HttpStatus.CREATED)",
@@ -655,7 +655,7 @@
     },
     {
       "evidence": "new IllegalArgumentException(\"BOUNDED_RECOVERY_INTERVAL_REQUIRED\");",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java"
     }
   ],
   "files": {
@@ -664,23 +664,23 @@
     "docs/managed-payment-recovery.md": "7da5b5e166fe2301484be2ff8de428f49fb55fef2912c02ff6fe5ceedd8454cb",
     "docs/payment-adapters.md": "3db26f13f13e010cd971ef739a0e57062fee9dc686cef009c463ef7f702acd5c",
     "domain-payments-core/pom.xml": "9adb55d1b2f67b9d5c2114f981365062873ba18eb733ed9769afa3206c0274b1",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/CreateManagedPaymentCommand.java": "c1d4c82658f15d4677d1ba13c273d63c5e1d5d0efd990a86586178ccb7a52fad",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/CreateManagedPaymentHandler.java": "f64ea33dfeda7f4d30795504c3befe4a3aecc9299c46d561c612e77d1b813fc2",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/DecideManagedPaymentCommand.java": "2b7c9b4999cb3dee27613edb0e13c13b7c15362d3b6001caa3ff14ad8539755f",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/DecideManagedPaymentHandler.java": "a49b0edb60ff1cfaa71b9663f3cb7614cf66eb0f7d6e70d01bd14674129fe7fc",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHandler.java": "e689e316fc3de3e30f1a9693bd5b0bf3029546b6b9ed77efd38bf1eb025ec557",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHistoryHandler.java": "b0923b463004afb90f4a707ee91086dea5677edea0d1d1e6eb42af80a4a64376",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHistoryQuery.java": "1540d5808014daa9849c868a9f88b45947b5818c8db13a9fc999eb252b84ac55",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentQuery.java": "70f6f4a23b58d8b9fbcb05b744a0bc24c73e2c7936a8f97ec79e9ed079a88cd3",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentContext.java": "7887abe3db9647e140640ae1b1a0622bbbe0a64af89cd5a176b87ef15f301a11",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlow.java": "d6c907a8c206e5d48b755ca57c8484f4552008a814b095f572b93916d7f7322e",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorker.java": "e085a329ab227862cce755da09ad277de68c6f1eea7cc4c536671f3eec9d5b31",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/RecoverManagedPaymentCommand.java": "d58de88e17170a12f5f5eb6edb94fe87713d6a5f8f58d547c86557edfc323849",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/RecoverManagedPaymentHandler.java": "8abe111181415e898931fa50ef0c587932791d5152621cc261a912a8f25c3fc8",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedFundsPort.java": "98e2b93ba2e1c28673a770a7a25adbfbb54b58201c2496195725a6ad53f9ab95",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentCorePort.java": "8d4f8fff82c5a77322126d5d4f0a05b81e61feb0dcdb06647b3b42397fb5b25f",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentWorkerActorPort.java": "bcc05e977116dfab3a71517282a7c65c6a59313c91d8d4932d53c105ab93f211",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/PaymentDelegationPort.java": "bcdffbffa7e8c14980dde5ac21f343b8992dd47e43e0174c68bd7959f5a133d8",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/CreateManagedPaymentCommand.java": "1d1facb68664a31d6a7249ddb6f3f4fc6b85e68a9035ed19fe0d20dcdbc8df17",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/CreateManagedPaymentHandler.java": "47ede4522a23c61dbfe2281b84738e1e5e607e12f0aa32911f2cd564f91ceb5a",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/DecideManagedPaymentCommand.java": "fbaf8cd1c80cf0768449719bad44dd3e1140beadaa9a5ac98ae7466c0d4a12ae",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/DecideManagedPaymentHandler.java": "88a9c8aa08a4a26934dd727babe8e564a2128d7837e314f43063fb93a979d434",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHandler.java": "e34cce1dd4fa28c8d96ff06fc15e94fb33da796ad3f125f764ef987b49912712",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHistoryHandler.java": "334e5f9148ebebd1bd827cd6a6ae2b5dff3c71232a8b00aa5807711480e9850d",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHistoryQuery.java": "06a25201077b7d7a13346f7d15f284f1ea612002d8f185ba2734bdd52d327fb5",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentQuery.java": "ed18d1388c340c41402b6351535c2730839c858ace4fbce4a410e2b8fdf69f30",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentContext.java": "47c4122011d7f48ef187641b177a6a663ab4c12d0c9fef7e5e80af56378b28eb",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorker.java": "72ea0f2302c74d3d143024d17330c3f98115d810cdbf0e271ad6445ac483da18",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/RecoverManagedPaymentCommand.java": "7b64ef8419a494ff8978fa5bb45d796be08b80cb2819e3e90381a7aa4c5a2d63",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/RecoverManagedPaymentHandler.java": "c582b00668da3753239b3d1ae28258a0b1ba5b07b3ce5a425ca9f2bc5295c146",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/impl/ManagedPaymentFlowServiceImpl.java": "f743e837e9db5cc46116956a0703c19a07880f871bb30f48ec3a0b16d4a629fa",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedFundsPort.java": "d2af83d03fc88306713b3ea6e1b60bd82e749105a9dab2afbb4d578f8208850b",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentCorePort.java": "888d92f073d36e07f9ff5b9e4148dd06f599aebdf21e401c8b51a84a9921d3cf",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentWorkerActorPort.java": "d210fb99f26fb2157c35a9fd6fbb5bee0784c3b206f9c2cd9095d1d477b2f226",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/PaymentDelegationPort.java": "1d1a028811f828e3bf47198205543a8b7352d98310ddc739c3e4c5cc6c6ff23a",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/ports/AccountPositionPort.java": "b30a01e89f73b0f50bd53a722ca845c58037ac8cec37773026b4f5f7ef33ad7e",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/ports/LedgerPort.java": "94ad4b2578dede6bb8ad60bea17fbdcca1443aa4e625f6afe2d5a8f51883910c",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/ports/PaymentConfigurationPort.java": "780e33873725be5dd66017a905146d841288d434d76ff0af6bb1767cb7281c4c",
@@ -697,18 +697,18 @@
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPaymentRailAdapter.java": "c4a88420d2442cd161ce0523aa4ec3abd78209136b29a8b45cf9d4dea1e81cc1",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPaymentRecordAdapter.java": "7be76e8a64fffb0d4b3879845f879d3ae471e88fcc30308a1dbb6a9c2c786f53",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/sandbox/SandboxPspAdapter.java": "ea10b824ae6841bb934b1841e6db6365b3cab4ce0d577a307e14b7c0ff6585c5",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHub.java": "39d2d6423d1fbbcfa5dbff9ee611a5d5765df1c036c9f64a6d32f5e8091608b7",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/tcc/impl/PaymentTccServiceImpl.java": "090bfd4e2ea450afa18fc40e93488ade5c522fe03316e12118f21bbc53f47a79",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/ChallengeDeliveryPort.java": "a90e90059b24aaf5d64e4717bcca80e7b8949c90eb0ba2ac659b73c5b5cbfa35",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/ChallengeStatus.java": "a62f7c5077adead64533f606e76eb2bc2fa58be52f09b2d6f272e07569e25f62",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/CoreScaClient.java": "64bebe958433be67ce0403cceb65ed5ee75cea79dd7e040ce21156347a885021",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SandboxChallengeDeliveryAdapter.java": "6b44d80df67ddfc0d4bbfeb386212f731ff78906ff65104c51d224fa9941a806",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SandboxCoreScaClient.java": "0446a2eccda49faeb7ad4368f2d7c31a498ff61dbd999586c5c5a2947746c3a2",
-    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/ScaChallengeService.java": "bde639fbe03ab87cc446cf3874ff4311190042abad85238c55a46e7e2a5ee791",
+    "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/ScaChallengeService.java": "195e4dd39768a1ac494ab58dff6b7ee671f5f64557fc0dbd2e2012a40a2147dd",
     "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/sca/SdkCoreScaClient.java": "d996bbbb7f64ae498352f2a454ce0e85b3e7a422962be0f8392ccf56637372f5",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java": "2e48e6be36aaeed3395335718f5625ea0f1e39a209c0c8991d1a07ce39cd64e0",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java": "e6dc12fe2d9b1ae5a75cc3aa044a79db32ae50da11b661e9f99bd090a23fd90b",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java": "74ba64df7940ff1cb175d8bfbea3974d48dd68cdc21ad2a927d998a1162bb10b",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHubTest.java": "782f60d5426d4568a6629c7cc3844f7a94fbc8b497dfad9a8c40c959f648d448",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java": "13c8fc03ea047e4fc9942969ed45fe05e3b1bce51fbc7d085164155f1119695f",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java": "5a546960af38eaf914549fff4d42b18c1ca328c49c96b7731108b408918bd01e",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java": "5b84ad98b29c0df0800e11cb97f2ec385848c9ed1013b982075bde2060229968",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHubTest.java": "a1d0b1a86abdafef263121722dc3e6c0568927f4c1e967b5efb6c61efa351984",
     "domain-payments-infra/pom.xml": "929b6ba5f5bd197c96b84a37a7b861668a3f8ec42c6b7350f1be00477286165e",
     "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/LibraryPaymentRailAdapter.java": "b77fac158b5ea50a3cc83a9ada30c03c39e62e92bd84167834871c643ccb94cd",
     "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/LibraryPspAdapter.java": "cda273718aa9e9dfa3f2041f729f49ac37dcbea292c17bf632beac25b63dd130",
@@ -719,20 +719,20 @@
     "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentConfigurationAdapter.java": "39bce94f7a3979a687e5c07891d77f794f6bb1413ac256cd695461e1e97ef03e",
     "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentMasterAdapter.java": "d2ca616e696c4adc17c9d2df12a5ff26eea3223add9435d72c8d782a8e84ed5f",
     "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/SdkPaymentRecordAdapter.java": "e37e694165059803fb815d103ceded750065243157e68676374550c1db1987da",
-    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapter.java": "63e5bcc608769b1e25895bc9ffbe4e2ab20b057a95eb735e744f174178ce6256",
-    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapter.java": "ce89582e40457e66dddeef23bf8918dfef57c8543c5657b6916b0eb8911314a1",
-    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapter.java": "c9e24ad4cf151aebda217a25f1e53aa842ae4be92a836aeda2bb52790b616bc2",
-    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapter.java": "9f85bfec65b282c2c785098dab81fbd7c57d65963eb7825612b1046c0598448c",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LedgerAtomicRuntimeIT.java": "9b2c26087bdb5c6a5e56926e62bc367fd3fd1a7554a28012ed60ef3a691a364b",
+    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapter.java": "69b8cc9033de945aa265cbfe5b8915482cc623e8c44668dffce12c725b7b64dd",
+    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapter.java": "1d324bfb9459173a081ee68763be521439b9c4f1a0a2de8988184fe57debc432",
+    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapter.java": "d13d44d9b94fcc0cea1a750175ee36793030dd6fe6cbdfbef4ddead04f7fbb74",
+    "domain-payments-infra/src/main/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapter.java": "68a29479dac983218bdcce474f5a28c01c6664fd68a23f26ba50171782c1a2ef",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LedgerAtomicRuntimeIT.java": "701b31ceebc36528058b706b1c89fed1efcd3f67782b8b5da071ca1c25d6a82a",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LibraryPaymentRailAdapterTest.java": "4b90aae0f6d445d5bdabb8b040c30f88302cf880ae3a5992df4ae68bcf74a7dd",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LiveAdapterTest.java": "0cc4f21787259e517035b15ce95775d24bc8eb42d66b13a88835fd375f73fda6",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/PaymentInstructionRecordsTest.java": "4ccbe0526d91aa45fdf8321958825113e94be4dd7d5af239cc26c0cfab9dfeb5",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterHttpTest.java": "1a2deb9154c90bf6f42ea68f82885e609a581959156804ce5f400b7a1fc8f59b",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterHttpTest.java": "8c349fb19c43063a20d752df9972d3c17ba17fa37aa0ebac07123f7131896ec1",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterTest.java": "1c7cae94e87ce3e263a0beb72cf9939b673187b120ef354c5430895bc8107ba9",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java": "15b2e29aa240abe5e41ff9d64b5c83affb83dc6d28b2adbff3c08e0a0412056d",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java": "3390060662a0a6c7ed4f572c6e487389bb1a2616ad431d508f2763f2f64b497a",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java": "23987216b523ab6a09c2c1d39814b198a6a01e10cb082dfc43d5fe788ed9e1a9",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java": "27f45287e25f4a7d3266745a52147be0d87349725a6765b7b65483403f99e830",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java": "eee6b87783e3975e0a526af1c2bd41b507beaf61874ae33a41ed36e3b82afe22",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java": "5cfe28502cf3ed5a0e2e899acd2748f847c939ed61fcbe18fc9f2770f89f197a",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java": "309ddc8565b34bfdecea044d07b74e30c5058424f5d236a0180ca3aa325d9fd8",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java": "90107b01b31debaf5faae3c3f24ab2aa1aa40443154fb01de7aa436bd549b94e",
     "domain-payments-interfaces/pom.xml": "30fa8584e88fbf9c172d5dc65a5f156c81d7921e7d4c87a896c577f407365a66",
     "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/EntrySide.java": "348a37f7ee9ac7f99cdc5fbef33b2bbd328d1b58f7c56cb147f5dc257958f194",
     "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/Idempotency.java": "e6138ae3e04a62aa4f8d94f23f63ffd5d96c83f0e0b18de4bc069ccfd1428f74",
@@ -755,30 +755,30 @@
     "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/RailKind.java": "0752beea014c92985badd1b730ec5f07a02a6735e713b4f6835299b667a161b4",
     "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/StoredPayment.java": "12c1cd18d8fdb22d09aba595d1c44479eb96313292bc0ea612ea5d1361eaddf1",
     "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/SyncMessages.java": "d5c2640416ed82bcb779d91c568c05a27c4918ff2a9286a4673dda75913f7d78",
-    "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/v1/ManagedPaymentContracts.java": "675c5f4ad6b854aea52670e388402cb0a3123395a1665827c493be2933f0f374",
+    "domain-payments-interfaces/src/main/java/io/fireflysoftware/domain/payments/managed/ManagedPaymentContracts.java": "a6a3526582d55f3a8c2fdb87e0ecf796df1050a8d3d26908cde5721d34c41475",
     "domain-payments-sdk/pom.xml": "7230efed2c26ac41aabea9c39b073bdf66f7fe496c409ea44d2188fe0d9deca9",
-    "domain-payments-sdk/src/main/resources/openapi.yml": "8c6262d8b2b7f263ade44dd4521c9bcf24031ae5d8a25cf46f7c080178af8079",
+    "domain-payments-sdk/src/main/resources/openapi.yml": "27a99f114307395940521db607f1ae8142b808bd5ee7c3993da81ab2a94ff8c6",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/GeneratedLegacyClientsTest.java": "091b49477ce5c483aa1c862eb5367e9da1e37758eb855ae85c0c35b20e222c73",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/LegacyPaymentClientsCompatibilityTest.java": "ad4ba1cd2c91f1cd78432d0f424c828fb06c6d4f5388ffa40c5f01ee906501e4",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/ManagedPaymentJourneysContractTest.java": "23b0ef90da57d00dd39b988ae55355b6a09cee10834ce0c2695024ff6f087d73",
     "domain-payments-web/pom.xml": "ccb7530025d7cae3d56eebe936bede980a3ec3d33ee03ee537dab659a954aab9",
     "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/DomainPaymentsApplication.java": "c89de5ca738802c434439b9404b55e95a4e4a9aac8a79856b9680f2bfb6a1c92",
     "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentRecordsController.java": "1d25740c7950e277236edef518488a4eb93efc900ec0366199a27be705623813",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java": "2dcb5f8ee2df13ac1fc915165472baaebfb8c93fafc16be59f0bc53972185ae1",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java": "479c0da9da6a4c6f4f9afb6a8ca866382c7e3f4e60cce0b64360b42f61782983",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java": "51927d959d9991bee701d7321e00f05049aee884d362bec58e23d6832dfdc7cf",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiring.java": "ffd0ea54b2882ab33e6a3acd6ef94622893993fb6680877ae6ef6543f4443e48",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java": "8b7230ef85fea80305791dc212820ce0ef1c8af00c1a5eaa6da189e36a86cc5c",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java": "445984886dc062c88628a5e1b7161bd6b4606a327551620ebf58b5e647233bf9",
-    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java": "b5a608b49eeb64c3547d314158cf3ff689a4d2e00be121c010be4330460ffe5c",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsController.java": "f0eb9ef033e32da9b1d92f9bd12577efb0ff9e91d9b02e23d5d5e72c987a3923",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/PaymentsWiring.java": "de4082e1d133e274709f29486a259a524c3bd8e053d4e9b99728a944ea52a933",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java": "cbbe1b74eca652836c4c5205986c426379ceeb90a11c82c49047b78e73a1b628",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiring.java": "bc3607b864dbed2feca148dc42738111b9e6f9da8608b2f9a08b727d2730c1f7",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java": "d4da2cdf2b7416d1f4e8e69b3dcd4b7f05c13e36b04803ecd7401929e022b16f",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java": "467a6ea5afb72aa0d27c5b3b26a3fc9557bab5b6c1f8b330ba05b054fc3ab538",
+    "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java": "23763d088ff0a26b47f5fb42aa8d256c8439e0b31871a6d78d16cf5965715145",
     "domain-payments-web/src/main/resources/application.yaml": "42d1be8fab700cbc8eea7dce35231b4cb58d3faaad0146bfb038e3b6722c08fb",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsControllerTest.java": "9b96eadf6836635db01175d5b42d635324d6a14b89fd9d34dd1a725888fad972",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsControllerTest.java": "1f82c88ebcc5456a4dea70ee04b66f7c99f9845a1b54dd44478ddc9f436f996e",
     "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsWiringTest.java": "4219650e97d4173a1f08e449026796c862c1a7bc2ea01769a1241e0fd5499c71",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java": "9b02c6375172868d8adedc268125ef59ddef1137e58b25edacf0f5927ea0caa3",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java": "a457bb60d71007e3dbbf1bdce0686fc1d89c6cffe72ed05ffd42e63823e29ccb",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java": "6006cc93103811f4d7df5afcb13cb0dd5f0be9e64d9938a4a81d06bf074176df",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java": "8e3cf4a81ffea084e0f157d990a73792ed6efaf025553513425c4de6d4c37f1e",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java": "45fa17c1e3ffc965bc5befe572b3e0cfe98686414ec2a908b6795a99d644d4f6",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java": "64d71b14bbf303ccf0f1b1342dc51c95b66af2cfead2c92725fc93e7164175f0",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java": "4d3ad65379efc75d27522ff350a65374c2a86138536b7ecd0458e18f0e3555b7",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java": "3d70e34ea3d6499d7e22fc14fd4c00556627b1bcf1a7eeca61dd2b7bbbdae5fa",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java": "092bb1d315fce72689393d3bafae1c19adcf75563b65431b429b8450d111e93e",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java": "8bf24b964686833a5038ef2028444bb52a5ef73e0bff2638f659b22c2c823d8a",
     "domain-payments-web/src/test/scripts/verify-packaged-runtime.py": "fdcd82c384acd9dc2bf6a9a2f32b60b18a1c009c88dbd5803ad319cd608399db",
     "pom.xml": "f1f87ccdc51ff3cf4e1181e91a6223ca8d21ca9876fbd4a87382db9f3dc1daf3",
     "scripts/ManagedPaymentDomainSdkProbe.java": "0990e6f3b788209065f635abc8f5c372f89efd64793b11da550cfdc80afda6fa",
@@ -881,7 +881,7 @@
       "mapping": "\"/{paymentId}\"",
       "method": "read",
       "owner": "ManagedPaymentsController",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java",
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java",
       "route": "/api/v1/tenants/{tenant}/internal-payments/{paymentId}",
       "signature": "public Mono<View> read( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId)",
       "verb": "GET"
@@ -891,7 +891,7 @@
       "mapping": "\"/{paymentId}/history\"",
       "method": "history",
       "owner": "ManagedPaymentsController",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java",
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java",
       "route": "/api/v1/tenants/{tenant}/internal-payments/{paymentId}/history",
       "signature": "public Mono<HistoryPage> history( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestParam(defaultValue = \"-1\") long afterVersion, @RequestParam(defaultValue = \"25\") int limit)",
       "verb": "GET"
@@ -901,7 +901,7 @@
       "mapping": "",
       "method": "create",
       "owner": "ManagedPaymentsController",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java",
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java",
       "route": "/api/v1/tenants/{tenant}/internal-payments",
       "signature": "public Mono<ResponseEntity<View>> create( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @RequestBody Create input)",
       "verb": "POST"
@@ -911,7 +911,7 @@
       "mapping": "\"/{paymentId}/decisions\"",
       "method": "decide",
       "owner": "ManagedPaymentsController",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java",
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java",
       "route": "/api/v1/tenants/{tenant}/internal-payments/{paymentId}/decisions",
       "signature": "public Mono<ResponseEntity<View>> decide( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Decision input)",
       "verb": "POST"
@@ -921,7 +921,7 @@
       "mapping": "\"/{paymentId}/recovery\"",
       "method": "recover",
       "owner": "ManagedPaymentsController",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsController.java",
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsController.java",
       "route": "/api/v1/tenants/{tenant}/internal-payments/{paymentId}/recovery",
       "signature": "public Mono<ResponseEntity<View>> recover( @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt, @PathVariable String tenant, @PathVariable UUID paymentId, @RequestBody Recovery input)",
       "verb": "POST"
@@ -1060,7 +1060,7 @@
         "Mono<ReservationObservation> observe(String tenant, EffectClaim claim)"
       ],
       "name": "ManagedFundsPort",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedFundsPort.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedFundsPort.java"
     },
     {
       "boundary": false,
@@ -1077,7 +1077,7 @@
         "Flux<HistoryEvent> history(String tenant, UUID payment, long after, int limit)"
       ],
       "name": "ManagedPaymentCorePort",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentCorePort.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentCorePort.java"
     },
     {
       "boundary": false,
@@ -1086,7 +1086,7 @@
         "Mono<ManagedPaymentContext.Call> current(String tenant)"
       ],
       "name": "ManagedPaymentWorkerActorPort",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/ManagedPaymentWorkerActorPort.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/ManagedPaymentWorkerActorPort.java"
     },
     {
       "boundary": false,
@@ -1095,7 +1095,7 @@
         "Mono<String> token(String audience, String tenant, Set<UUID> accounts, Set<String> scopes)"
       ],
       "name": "PaymentDelegationPort",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/ports/PaymentDelegationPort.java"
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/ports/PaymentDelegationPort.java"
     },
     {
       "boundary": false,
@@ -1240,67 +1240,67 @@
     {
       "default": "",
       "key": "managed-payments.security.issuer",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java"
     },
     {
       "default": "",
       "key": "managed-payments.security.audience",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java"
     },
     {
       "default": "",
       "key": "managed-payments.security.jwk-set-uri",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java"
     },
     {
       "default": "false",
       "key": "managed-payments.allow-loopback-http",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorAutoConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorAutoConfiguration.java"
     },
     {
       "default": "",
       "key": "managed-payments.security.issuer",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java"
     },
     {
       "default": "",
       "key": "managed-payments.security.audience",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java"
     },
     {
       "default": "",
       "key": "managed-payments.security.jwk-set-uri",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsSecurityConfiguration.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsSecurityConfiguration.java"
     },
     {
       "default": "unconfigured",
       "key": "managed-payments.delegation.mode",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "",
       "key": "managed-payments.peers.payment-core.base-url",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "",
       "key": "managed-payments.peers.payment-core.audience",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "false",
       "key": "managed-payments.allow-loopback-http",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "",
       "key": "managed-payments.peers.ledger.base-url",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "",
       "key": "managed-payments.peers.ledger.audience",
-      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsWiring.java"
+      "path": "domain-payments-web/src/main/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsWiring.java"
     },
     {
       "default": "8092",
@@ -1416,99 +1416,99 @@
   "test_cases": [
     {
       "name": "runtime",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "createUsesActualInjectedSagaAndCoreReceiptWithoutSessionMap",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "noTransientActorCannotBorrowNativeContext",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "missingNativeContextIsDeniedBeforePorts",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "mismatchedNativeActorCannotBorrowTrustedBearer",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "failedCommitNeverAutomaticallyReleasesAndKeepsStableParticipant",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "currentDecisionConflictIsNotReplacedByAReadSuccess",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "mismatchedCoreCreateReceiptCannotDispatchDifferentImmutableIntent",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "mismatchedClaimReceiptCannotDispatchDifferentOriginalTtl",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "historyRetainsOriginalCompletionAndDistinctReversalWithCurrentPairAuthority",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "historyRequiresCurrentExactPairBeforeFetchingEvents",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "historyBoundsRejectBeforeAnyCoreRead",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "oversizedOrDisorderedOwnerHistoryCannotBecomeAnUnboundedOrReorderedTimeline",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java"
     },
     {
       "name": "handlersRequireExplicitNativeContextBeforeFlow",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java"
     },
     {
       "name": "commandsAndQueriesHaveStableNonsecretNativeIdentityAndNoReadCache",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java"
     },
     {
       "name": "missingRealActorCannotDiscoverOrMutate",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "queueOnlyExactVersionAndDeterministicNativeRecoveryKeepRealWorkerContext",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "failureReturnsToSchedulerWithoutImmediateRecoveryOrClaimLoops",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "staleObservedVersionDefersWithoutFetchingAnotherVersion",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "expiredActorBetweenDiscoveryAndCommandCannotContinue",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "exhaustedOwnerReceiptCannotBecomeAutomaticManualOverride",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "asynchronousOverlapAndCancellationReleaseRunGuard",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "thirdQueuedItemWaitsForAnActiveNativeCommandToComplete",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "invalidBoundsFailBeforeAnyAuthorityOrDiscovery",
-      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java"
+      "path": "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java"
     },
     {
       "name": "outboundTryConfirmAndCancelUseTheSandboxChallenge",
@@ -1668,71 +1668,71 @@
     },
     {
       "name": "delegationRequiresExplicitConfigurationAndExactCurrentAudienceScopesResources",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java"
     },
     {
       "name": "assertDenied",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java"
     },
     {
       "name": "close",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "realNativeManagerAcquiresFiniteSignedBoundWorkerAndRefreshesAtActualSixtySecondSkew",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "signedIssuerAudienceTenantClientAndMissingBindingCannotBecomeWorkerAuthority",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "expiredOrOverlongSignedAndOAuthLifetimesFailClosed",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "tenantRegistrationIsolationRejectsReusedRegistrationAndUnregisteredTenantBeforeToken",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "assertDenied",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java"
     },
     {
       "name": "close",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "reserveUsesStableOperationOriginalTtlAndPinnedDeadline",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "commitUsesRetainedReservationAndParticipantAction",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "observerUsesExactReconciliationThenLedgerExpiryAndReobservesEarlyConflict",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "changedEchoTtlFailsClosedBeforeExpiry",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "deniedExpiryNeverBecomesLocalExpiry",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java"
     },
     {
       "name": "genuineSdkPreserves201And200BodiesAndExactPinnedInput",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java"
     },
     {
       "name": "peerDeniedBodyAndCredentialCannotEscapeAdapter",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java"
     },
     {
       "name": "noUnconfiguredOrCredentialBearingPeerUrlCanSendToken",
-      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java"
+      "path": "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java"
     },
     {
       "name": "legacyClientsComeEntirelyFromTheOpenApiGenerator",
@@ -1800,105 +1800,105 @@
     },
     {
       "name": "onlyExactKnownNativeQueryWrapperCanPreserveSanitizedDenial",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java"
     },
     {
       "name": "unknownQueryFailureRetainsStandardInternalErrorInsteadOfRootCauseGuess",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java"
     },
     {
       "name": "plainProjectAuthorityWinsWhenWorkerWiringIsRegisteredFirst",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "plainProjectAuthorityWinsWhenProjectConfigurationIsRegisteredFirst",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "bootDeferredDefaultRemainsClosedAndDoesNotScheduleWhenDisabled",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "plainProjectAuthorityDoesNotRequireNativeOauthRegistrationsWhenRecoveryIsDisabled",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "configuredDefaultWithoutNativeServicesCannotCreateAuthority",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "deferredDefaultBacksOffAfterEagerApplicationScanWithConfiguredProperties",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "actualBootContextInjectsThePlainProjectActorIntoEnabledWorkerInEitherSourceOrder",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java"
     },
     {
       "name": "disabledDefaultRegistersNoRecoveryOrScheduleAndNoSyntheticActor",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java"
     },
     {
       "name": "enabledWithoutRealAuthorityCannotBorrowLegacySandboxIdentity",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java"
     },
     {
       "name": "invalidConfiguredBoundsFailStartupRatherThanSilentlyChangingBatch",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java"
     },
     {
       "name": "nativeSchedulerKeepsAsyncOverlapGuardAndStopCancelsOnlyItsOwnTask",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java"
     },
     {
       "name": "trust",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java"
     },
     {
       "name": "close",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java"
     },
     {
       "name": "signedNativeCommandReplayRechecksCurrentScopesAndDiagnosticsStayDenied",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java"
     },
     {
       "name": "currentResourceGrantIsEnforcedBeforeNativeCommandAndReadCannotUseQueryCache",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java"
     },
     {
       "name": "signedHistoryQueryPreservesReferencesAndRechecksCurrentReadAuthority",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java"
     },
     {
       "name": "managedCreateCannotInheritLegacySandboxOrUsernameAuthority",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     },
     {
       "name": "unconfiguredManagedReadDeniesForgedBearerBeforeLegacyAdapters",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     },
     {
       "name": "sagaDiagnosticsAreNotAnUnauthenticatedFinancialReadPath",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     },
     {
       "name": "openApiContractCanBeGeneratedWithoutFinancialAuthority",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     },
     {
       "name": "publicContractRuleDoesNotPermitUnknownApplicationRoutes",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     },
     {
       "name": "nativeProducerYamlContractIsAlsoGetOnlyPublic",
-      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java"
+      "path": "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java"
     }
   ],
   "tests": [
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentFlowTest.java",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentHandlersTest.java",
-    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/v1/ManagedPaymentRecoveryWorkerTest.java",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentFlowTest.java",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentHandlersTest.java",
+    "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/managed/ManagedPaymentRecoveryWorkerTest.java",
     "domain-payments-core/src/test/java/io/fireflysoftware/domain/payments/core/tcc/PaymentTccHubTest.java",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LedgerAtomicRuntimeIT.java",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/LibraryPaymentRailAdapterTest.java",
@@ -1906,20 +1906,20 @@
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/PaymentInstructionRecordsTest.java",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterHttpTest.java",
     "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/SdkLedgerAdapterTest.java",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/ManagedPaymentDelegationAdapterTest.java",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/OAuthManagedPaymentWorkerActorAdapterTest.java",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedFundsAdapterTest.java",
-    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/v1/SdkManagedPaymentCoreAdapterTest.java",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/ManagedPaymentDelegationAdapterTest.java",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/OAuthManagedPaymentWorkerActorAdapterTest.java",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedFundsAdapterTest.java",
+    "domain-payments-infra/src/test/java/io/fireflysoftware/domain/payments/infra/managed/SdkManagedPaymentCoreAdapterTest.java",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/GeneratedLegacyClientsTest.java",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/LegacyPaymentClientsCompatibilityTest.java",
     "domain-payments-sdk/src/test/java/io/fireflysoftware/domain/payments/sdk/ManagedPaymentJourneysContractTest.java",
     "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsControllerTest.java",
     "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/PaymentsWiringTest.java",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentTransportErrorsTest.java",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerActorConfigurationTest.java",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentWorkerWiringTest.java",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsAuthenticatedRuntimeTest.java",
-    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/v1/ManagedPaymentsRuntimeTest.java",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentTransportErrorsTest.java",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerActorConfigurationTest.java",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentWorkerWiringTest.java",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsAuthenticatedRuntimeTest.java",
+    "domain-payments-web/src/test/java/io/fireflysoftware/domain/payments/web/managed/ManagedPaymentsRuntimeTest.java",
     "domain-payments-web/src/test/scripts/verify-packaged-runtime.py"
   ],
   "types": [
@@ -1943,7 +1943,7 @@
         }
       ],
       "name": "CreateManagedPaymentCommand",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/CreateManagedPaymentCommand.java",
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/CreateManagedPaymentCommand.java",
       "persistent": false
     },
     {
@@ -1971,7 +1971,7 @@
         }
       ],
       "name": "DecideManagedPaymentCommand",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/DecideManagedPaymentCommand.java",
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/DecideManagedPaymentCommand.java",
       "persistent": false
     },
     {
@@ -2004,7 +2004,7 @@
         }
       ],
       "name": "GetManagedPaymentHistoryQuery",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentHistoryQuery.java",
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentHistoryQuery.java",
       "persistent": false
     },
     {
@@ -2027,7 +2027,7 @@
         }
       ],
       "name": "GetManagedPaymentQuery",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/GetManagedPaymentQuery.java",
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/GetManagedPaymentQuery.java",
       "persistent": false
     },
     {
@@ -2055,7 +2055,7 @@
         }
       ],
       "name": "RecoverManagedPaymentCommand",
-      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/v1/RecoverManagedPaymentCommand.java",
+      "path": "domain-payments-core/src/main/java/io/fireflysoftware/domain/payments/core/managed/RecoverManagedPaymentCommand.java",
       "persistent": false
     },
     {

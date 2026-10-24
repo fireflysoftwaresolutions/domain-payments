@@ -1,1 +1,1 @@
-io.fireflysoftware.domain.payments.web.managed.v1.ManagedPaymentWorkerActorAutoConfiguration
+io.fireflysoftware.domain.payments.web.managed.ManagedPaymentWorkerActorAutoConfiguration
