@@ -2,6 +2,9 @@ server:
   port: ${SERVER_PORT:8092}
 
 spring:
+  application:
+    name: domain-payments
+    description: Durable payment orchestration domain
   autoconfigure:
     exclude:
       - io.github.resilience4j.springboot3.bulkhead.autoconfigure.BulkheadAutoConfiguration
@@ -26,8 +29,34 @@ firefly:
     mode: sandbox
     configuration: sandbox
     ledger-base-url: ${LEDGER_URL:http://localhost:8083}
-    accounts-domain-base-url: ${ACCOUNTS_DOMAIN_URL:http://localhost:8090}
+    accounts-base-url: ${ACCOUNTS_CORE_URL:http://localhost:8080}
     payments-core-base-url: ${PAYMENTS_CORE_URL:http://localhost:8084}
     config-base-url: ${CONFIG_URL:http://localhost:8085}
     masters-base-url: ${MASTERS_URL:http://localhost:8086}
     sca-base-url: ${SCA_URL:http://localhost:8087}
+
+# Managed financial journeys have independent trust and peers; legacy sandbox mode supplies neither.
+managed-payments:
+  security:
+    issuer: ${MANAGED_PAYMENTS_DOMAIN_ISSUER:}
+    audience: ${MANAGED_PAYMENTS_DOMAIN_AUDIENCE:}
+    jwk-set-uri: ${MANAGED_PAYMENTS_DOMAIN_JWKS_URI:}
+  delegation:
+    mode: ${MANAGED_PAYMENTS_DOMAIN_DELEGATION_MODE:unconfigured}
+  allow-loopback-http: ${MANAGED_PAYMENTS_DOMAIN_ALLOW_LOOPBACK_HTTP:false}
+  peers:
+    payment-core:
+      base-url: ${MANAGED_PAYMENTS_DOMAIN_CORE_URL:}
+      audience: ${MANAGED_PAYMENTS_DOMAIN_CORE_AUDIENCE:}
+    ledger:
+      base-url: ${MANAGED_PAYMENTS_DOMAIN_LEDGER_URL:}
+      audience: ${MANAGED_PAYMENTS_DOMAIN_LEDGER_AUDIENCE:}
+
+  recovery:
+    enabled: ${MANAGED_PAYMENTS_DOMAIN_RECOVERY_ENABLED:false}
+    actor-mode: ${MANAGED_PAYMENTS_DOMAIN_WORKER_ACTOR_MODE:unconfigured}
+    interval-seconds: ${MANAGED_PAYMENTS_DOMAIN_RECOVERY_INTERVAL_SECONDS:5}
+    batch-size: ${MANAGED_PAYMENTS_DOMAIN_RECOVERY_BATCH_SIZE:25}
+    concurrency: ${MANAGED_PAYMENTS_DOMAIN_RECOVERY_CONCURRENCY:2}
+    max-run-seconds: ${MANAGED_PAYMENTS_DOMAIN_RECOVERY_MAX_RUN_SECONDS:60}
+    # Provide the tenant-to-registration map and native OAuth client credentials through deployment configuration.

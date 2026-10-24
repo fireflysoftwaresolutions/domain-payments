@@ -18,7 +18,9 @@ package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,31 +36,36 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/payments")
+@Tag(name = "Payments", description = "Try, confirm, and cancel a payment")
 public class PaymentsController {
 
-    private final PaymentTccHub hub;
+    private final PaymentTccService hub;
 
-    public PaymentsController(PaymentTccHub hub) {
+    public PaymentsController(PaymentTccService hub) {
         this.hub = hub;
     }
 
     @PostMapping("/tries")
+    @Operation(operationId = "tryPayment")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<MovementResult> tryPayment(@RequestBody MovementCommand command) {
         return Mono.fromCallable(() -> hub.tryPayment(command)).subscribeOn(Schedulers.boundedElastic());
     }
 
     @PostMapping("/{paymentId}/confirmations")
+    @Operation(operationId = "confirmPayment")
     public Mono<MovementResult> confirm(@PathVariable UUID paymentId, @RequestBody Confirmation confirmation) {
         return Mono.fromCallable(() -> hub.confirm(paymentId, confirmation.response())).subscribeOn(Schedulers.boundedElastic());
     }
 
     @PostMapping("/{paymentId}/cancellations")
+    @Operation(operationId = "cancelPayment")
     public Mono<MovementResult> cancel(@PathVariable UUID paymentId) {
         return Mono.fromCallable(() -> hub.cancel(paymentId)).subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/{paymentId}")
+    @Operation(operationId = "readPayment")
     public Mono<MovementResult> status(@PathVariable UUID paymentId) {
         return Mono.fromCallable(() -> hub.status(paymentId)).subscribeOn(Schedulers.boundedElastic());
     }

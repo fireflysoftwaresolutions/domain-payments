@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package io.fireflysoftware.domain.payments.core.tcc;
+package io.fireflysoftware.domain.payments.core.tcc.impl;
+
+import io.fireflysoftware.domain.payments.core.tcc.*;
 
 import io.fireflysoftware.domain.payments.EntrySide;
 import io.fireflysoftware.domain.payments.LedgerLeg;
@@ -35,6 +37,7 @@ import io.fireflysoftware.domain.payments.sca.ChallengeStatus;
 import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
 import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
+import io.fireflysoftware.domain.payments.sca.impl.ScaChallengeServiceImpl;
 import io.fireflysoftware.domain.payments.SyncMessages.InboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.OutboundInstruction;
 import io.fireflysoftware.domain.payments.SyncMessages.SyncResult;
@@ -67,7 +70,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Jafly runs try and then confirm inside one engine call, so the customer challenge sits between
  * three coordinators: {@code PaymentTry}, {@code PaymentConfirm}, and {@code PaymentCancel}.
  */
-public final class PaymentTccHub {
+public final class PaymentTccServiceImpl implements PaymentTccService {
 
     static final String TRY = "PaymentTry";
     static final String CONFIRM = "PaymentConfirm";
@@ -87,7 +90,7 @@ public final class PaymentTccHub {
     private final ConcurrentHashMap<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, UUID> byKey = new ConcurrentHashMap<>();
 
-    public PaymentTccHub(LedgerPort ledger,
+    public PaymentTccServiceImpl(LedgerPort ledger,
                          PaymentRecordPort records,
                          PaymentRailPort rail,
                          PspPort psp,
@@ -113,24 +116,24 @@ public final class PaymentTccHub {
         this.cancelTcc = cancelDefinition();
     }
 
-    public static PaymentTccHub create(LedgerPort ledger,
+    public static PaymentTccService create(LedgerPort ledger,
                                        PaymentRecordPort records,
                                        PaymentRailPort rail,
                                        PspPort psp,
                                        PaymentConfigurationPort configuration,
                                        PaymentMasterPort masters,
                                        ScaChallengeService sca) {
-        return new PaymentTccHub(ledger, records, rail, psp, configuration, masters, new SchemeRouter(), sca);
+        return new PaymentTccServiceImpl(ledger, records, rail, psp, configuration, masters, new SchemeRouter(), sca);
     }
 
-    public static PaymentTccHub sandbox(LedgerPort ledger,
+    public static PaymentTccService sandbox(LedgerPort ledger,
                                         PaymentRecordPort records,
                                         PaymentRailPort rail,
                                         PspPort psp,
                                         PaymentConfigurationPort configuration,
                                         PaymentMasterPort masters) {
         return create(ledger, records, rail, psp, configuration, masters,
-                new ScaChallengeService(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter()));
+                new ScaChallengeServiceImpl(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter()));
     }
 
     public MovementResult tryPayment(MovementCommand command) {

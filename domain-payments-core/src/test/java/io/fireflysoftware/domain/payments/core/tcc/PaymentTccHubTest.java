@@ -16,6 +16,9 @@
 
 package io.fireflysoftware.domain.payments.core.tcc;
 
+import io.fireflysoftware.domain.payments.sca.impl.ScaChallengeServiceImpl;
+import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
+
 import io.fireflysoftware.domain.payments.EntrySide;
 import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
@@ -54,13 +57,13 @@ class PaymentTccHubTest {
 
     private SandboxLedgerAdapter ledger;
     private SandboxPaymentRailAdapter rail;
-    private PaymentTccHub hub;
+    private PaymentTccService hub;
 
     @BeforeEach
     void setUp() {
         ledger = new SandboxLedgerAdapter();
         rail = new SandboxPaymentRailAdapter();
-        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
                 rail, new SandboxPspAdapter(), new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
     }
 
@@ -131,7 +134,7 @@ class PaymentTccHubTest {
     @Test
     void internationalOutboundConfirmsOnTheRailNotThePsp() {
         SandboxPspAdapter psp = new SandboxPspAdapter();
-        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
                 rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         MovementResult tried = hub.tryPayment(command(PaymentScheme.INTERNATIONAL_OUTBOUND, "swift-1", SOURCE, null));
         MovementResult confirmed = hub.confirm(tried.paymentId(), tried.challengeValue());
@@ -171,7 +174,7 @@ class PaymentTccHubTest {
     @Test
     void cardCollectionUsesThePspAndACreditTransferDoesNot() {
         SandboxPspAdapter psp = new SandboxPspAdapter();
-        hub = PaymentTccHub.sandbox(ledger, new SandboxPaymentRecordAdapter(),
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
                 rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         MovementResult card = hub.tryPayment(inbound(PaymentScheme.PSP_INBOUND, "card-ref-1"));
         hub.confirm(card.paymentId(), null);
@@ -221,5 +224,15 @@ class PaymentTccHubTest {
     private MovementCommand command(PaymentScheme scheme, String key, UUID source, UUID destination) {
         return new MovementCommand(scheme, key, AMOUNT, "EUR", PARTY, CONTRACT, source, destination,
                 null, null, null, METHOD, "Beneficiary", "DE89370400440532013000", "COBADEFFXXX", null);
+    }
+
+    @Test void legacyBusinessServicesExposeInterfacesAndPreserveIssuedRecordIdentity() throws Exception {
+        var tcc=Class.forName("io.fireflysoftware.domain.payments.core.tcc.PaymentTccService");
+        assertTrue(tcc.isInterface());
+        assertTrue(tcc.isAssignableFrom(Class.forName("io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl")));
+        var sca=Class.forName("io.fireflysoftware.domain.payments.sca.ScaChallengeService");
+        assertTrue(sca.isInterface());
+        assertTrue(sca.isAssignableFrom(Class.forName("io.fireflysoftware.domain.payments.sca.impl.ScaChallengeServiceImpl")));
+        assertEquals("io.fireflysoftware.domain.payments.sca.ScaChallengeService$Issued",sca.getMethod("create",UUID.class,UUID.class).getReturnType().getName());
     }
 }

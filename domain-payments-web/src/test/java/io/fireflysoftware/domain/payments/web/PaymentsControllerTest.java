@@ -20,7 +20,8 @@ import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.MovementResult;
 import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
-import io.fireflysoftware.domain.payments.core.tcc.PaymentTccHub;
+import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
+import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapter;
@@ -41,7 +42,7 @@ class PaymentsControllerTest {
 
     @Test
     void tryThenConfirmUsesTheGeneratedChallenge() {
-        PaymentTccHub hub = PaymentTccHub.sandbox(new SandboxLedgerAdapter(),
+        PaymentTccService hub = PaymentTccServiceImpl.sandbox(new SandboxLedgerAdapter(),
                 new SandboxPaymentRecordAdapter(), new SandboxPaymentRailAdapter(), new SandboxPspAdapter(),
                 new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
         PaymentsController controller = new PaymentsController(hub);
