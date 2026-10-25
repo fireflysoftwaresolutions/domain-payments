@@ -1171,6 +1171,7 @@ components:
           - COMMITTING
           - CANCELLING
           - COMPLETED
+          - REVERSING
           - REVERSED
           - CANCELLED
           - EXPIRED
@@ -1227,6 +1228,7 @@ components:
           enum:
           - CONFIRM
           - CANCEL
+          - REVERSE
         expectedVersion:
           type: integer
           format: int64
@@ -1522,6 +1524,7 @@ components:
           - COMMITTING
           - CANCELLING
           - COMPLETED
+          - REVERSING
           - REVERSED
           - CANCELLED
           - EXPIRED

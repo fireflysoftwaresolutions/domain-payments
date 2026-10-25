@@ -109,12 +109,14 @@ class ManagedPaymentFlowTest {
                                             "payments:read",
                                             "payments:confirm",
                                             "payments:cancel",
+                                            "payments:reverse",
                                             "payments:recover",
                                             "payments:coordinate",
                                             "funds:read",
                                             "funds:reserve",
                                             "funds:commit",
                                             "funds:release",
+                                            "funds:reverse",
                                             "funds:reconcile",
                                             "funds:expire"))
                             .claims(
@@ -269,6 +271,81 @@ class ManagedPaymentFlowTest {
                                     e -> assertThat(e.getStatusCode().value()).isEqualTo(403));
                     verifyNoInteractions(f.core, f.funds);
                 });
+    }
+
+    @Test
+    void reverseDecisionUsesSelectedParticipantWithoutRelease() {
+        runtime((f, c) -> {
+            var before = f.view(State.COMPLETED, 8, null);
+            var reversing = f.view(State.valueOf("REVERSING"), 9, f.effect);
+            var claimed = f.view(State.valueOf("REVERSING"), 10, f.effect);
+            var reversed = f.view(State.REVERSED, 11, null);
+            var claim = f.claim(EffectKind.valueOf("REVERSE"), claimed);
+            var decision = new Decision(UUID.randomUUID(), DecisionKind.valueOf("REVERSE"), 8L);
+            when(f.core.read("owned", f.payment)).thenReturn(Mono.just(before), Mono.just(reversed));
+            when(f.core.decide("owned", f.payment, decision)).thenReturn(Mono.just(reversing));
+            when(f.core.claim(eq("owned"), eq(f.payment), any())).thenReturn(Mono.just(claim));
+            when(f.funds.act("owned", claim)).thenReturn(Mono.just(
+                    new ManagedFundsPort.ReservationObservation(f.payment, f.reservation,
+                            "REVERSED", f.posting, UUID.randomUUID(), null)));
+            when(f.core.acknowledge(eq("owned"), eq(f.payment), any())).thenReturn(Mono.just(reversed));
+            var result = f.authorized(flow(f, c).decide("owned", f.payment, decision, f.nativeContext));
+            assertThat(result.state()).isEqualTo(State.REVERSED);
+            assertThat(result.notAfterEpochMillis()).isEqualTo(f.deadline);
+            verify(f.core).decide("owned", f.payment, decision);
+            verify(f.funds).act("owned", claim);
+            verify(f.funds, never()).reserve(anyString(), any());
+            verify(f.funds, never()).observe(anyString(), any());
+        });
+    }
+
+    @Test
+    void reverseRequiresItsOwnCurrentPermissionsBeforeMutation() {
+        for (String missing : List.of("payments:reverse", "funds:reverse")) {
+            runtime((f, c) -> {
+                var before = f.view(State.COMPLETED, 8, null);
+                var decision = new Decision(UUID.randomUUID(), DecisionKind.valueOf("REVERSE"), 8L);
+                var scopes = new HashSet<>(f.actor().principal().scopes());
+                scopes.remove(missing);
+                var principal = SecurityPrincipal.builder().issuer("owned-test").subject("owned-actor")
+                        .tenantId("owned").scopes(scopes).claims(f.actor().principal().claims()).build();
+                var actor = new ManagedPaymentContext.Call(principal, "TRANSIENT-TEST-CREDENTIAL", Set.of("domain", "core", "ledger"));
+                when(f.core.read("owned", f.payment)).thenReturn(Mono.just(before));
+                assertThatThrownBy(() -> flow(f, c).decide("owned", f.payment, decision, f.nativeContext)
+                        .contextWrite(context -> ManagedPaymentContext.with(context, actor)).block(WAIT))
+                        .isInstanceOfSatisfying(ResponseStatusException.class,
+                                error -> assertThat(error.getStatusCode().value()).isEqualTo(403));
+                verify(f.core, never()).decide(anyString(), any(), any());
+                verifyNoInteractions(f.funds);
+            });
+        }
+    }
+
+    @Test
+    void reverseRecoveryRequiresCurrentReversePermissionBeforeFinancialExecution() {
+        runtime((f, c) -> {
+            var reversing = f.view(State.REVERSING, 9, f.effect);
+            var claimed = f.view(State.REVERSING, 10, f.effect);
+            var reversed = f.view(State.REVERSED, 11, null);
+            var claim = f.claim(EffectKind.REVERSE, claimed);
+            var scopes = new HashSet<>(f.actor().principal().scopes());
+            scopes.remove("payments:reverse");
+            var principal = SecurityPrincipal.builder().issuer("owned-test").subject("owned-actor")
+                    .tenantId("owned").scopes(scopes).claims(f.actor().principal().claims()).build();
+            var actor = new ManagedPaymentContext.Call(principal, "TRANSIENT-TEST-CREDENTIAL", Set.of("domain", "core", "ledger"));
+            when(f.core.read("owned", f.payment)).thenReturn(Mono.just(reversing), Mono.just(reversed));
+            when(f.core.recover(eq("owned"), eq(f.payment), any())).thenReturn(Mono.just(reversing));
+            when(f.core.claim(eq("owned"), eq(f.payment), any())).thenReturn(Mono.just(claim));
+            when(f.funds.act("owned", claim)).thenReturn(Mono.just(new ManagedFundsPort.ReservationObservation(
+                    f.payment, f.reservation, "REVERSED", f.posting, UUID.randomUUID(), null)));
+            when(f.core.acknowledge(eq("owned"), eq(f.payment), any())).thenReturn(Mono.just(reversed));
+            assertThatThrownBy(() -> flow(f, c).recover("owned", f.payment,
+                    new Recovery(UUID.randomUUID(), 9L), f.nativeContext)
+                    .contextWrite(context -> ManagedPaymentContext.with(context, actor)).block(WAIT))
+                    .isInstanceOfSatisfying(ResponseStatusException.class,
+                            error -> assertThat(error.getStatusCode().value()).isEqualTo(403));
+            verifyNoInteractions(f.funds);
+        });
     }
 
     @Test

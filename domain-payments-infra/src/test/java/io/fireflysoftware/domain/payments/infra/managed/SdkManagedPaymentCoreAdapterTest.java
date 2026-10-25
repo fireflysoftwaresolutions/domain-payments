@@ -127,6 +127,44 @@ class SdkManagedPaymentCoreAdapterTest {
     }
 
     @Test
+    void reverseDecisionDelegatesItsOwnScopeAndDecodesReversingThroughGenuineSdk() throws Exception {
+        var requested = new java.util.concurrent.atomic.AtomicReference<Set<String>>();
+        var bodies = new java.util.concurrent.CopyOnWriteArrayList<com.fasterxml.jackson.databind.JsonNode>();
+        var json = new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            bodies.add(json.readTree(exchange.getRequestBody()));
+            var output = json.<com.fasterxml.jackson.databind.node.ObjectNode>valueToTree(view);
+            output.put("state", "REVERSING");
+            byte[] bytes = json.writeValueAsBytes(output);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
+        server.start();
+        try {
+            PaymentDelegationPort tokens = (audience, tenant, accounts, scopes) -> {
+                requested.set(scopes);
+                return Mono.just("synthetic-current-token");
+            };
+            var adapter = new SdkManagedPaymentCoreAdapter(tokens,
+                    "http://127.0.0.1:" + server.getAddress().getPort(), "core", true);
+            var decision = new Decision(action, DecisionKind.REVERSE, 8L);
+            var actor = fixture.actor(Set.of("core"), Set.of("payments:reverse"), Instant.now().plusSeconds(60));
+            var result = fixture.run(adapter.decide("owned", id, decision), actor);
+            assertThat(result.state()).isEqualTo(State.REVERSING);
+            assertThat(requested.get()).containsExactly("payments:reverse");
+            assertThat(bodies).hasSize(1);
+            assertThat(bodies.getFirst().get("kind").asText()).isEqualTo("REVERSE");
+            assertThat(bodies.getFirst().get("actionId").asText()).isEqualTo(action.toString());
+            assertThat(bodies.getFirst().get("expectedVersion").asLong()).isEqualTo(8);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
     void peerDeniedBodyAndCredentialCannotEscapeAdapter() throws Exception {
         var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext(

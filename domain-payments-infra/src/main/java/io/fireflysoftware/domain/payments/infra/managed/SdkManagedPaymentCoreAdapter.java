@@ -202,7 +202,11 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
     }
 
     public Mono<View> decide(String t, UUID id, Decision in) {
-        String scope = in.kind() == DecisionKind.CONFIRM ? "payments:confirm" : "payments:cancel";
+        String scope = switch (in.kind()) {
+            case CONFIRM -> "payments:confirm";
+            case CANCEL -> "payments:cancel";
+            case REVERSE -> "payments:reverse";
+        };
         return safe(
                 () ->
                         existing(t, scope)

@@ -32,6 +32,7 @@ public final class ManagedPaymentContracts {
         COMMITTING,
         CANCELLING,
         COMPLETED,
+        REVERSING,
         REVERSED,
         CANCELLED,
         EXPIRED,
@@ -90,7 +91,8 @@ public final class ManagedPaymentContracts {
         RESERVE,
         COMMIT,
         RELEASE,
-        OBSERVE
+        OBSERVE,
+        REVERSE
     }
 
     @io.swagger.v3.oas.annotations.media.Schema(
@@ -164,7 +166,8 @@ public final class ManagedPaymentContracts {
 
     public enum DecisionKind {
         CONFIRM,
-        CANCEL
+        CANCEL,
+        REVERSE
     }
 
     @io.swagger.v3.oas.annotations.media.Schema(

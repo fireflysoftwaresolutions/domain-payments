@@ -43,6 +43,7 @@ class SdkManagedFundsAdapterTest {
                 b = UUID.randomUUID(),
                 reservation = UUID.randomUUID(),
                 posting = UUID.randomUUID(),
+                reversal = UUID.randomUUID(),
                 effect = UUID.randomUUID();
         final long deadline = System.currentTimeMillis() + 30000;
         final List<String> paths = new java.util.concurrent.CopyOnWriteArrayList<>();
@@ -84,9 +85,11 @@ class SdkManagedFundsAdapterTest {
                                     earlyExpire
                                             ? Map.of("error", "NOT_DUE")
                                             : reservation(
-                                                    body.get("action").asText().equals("COMMIT")
-                                                            ? "COMMITTED"
-                                                            : "EXPIRED");
+                                                    switch (body.get("action").asText()) {
+                                                        case "COMMIT" -> "COMMITTED";
+                                                        case "REVERSE" -> "REVERSED";
+                                                        default -> "EXPIRED";
+                                                    });
                         } else output = reservation("HELD");
                         byte[] bytes = mapper.writeValueAsBytes(output);
                         e.getResponseHeaders().set("Content-Type", "application/json");
@@ -98,7 +101,7 @@ class SdkManagedFundsAdapterTest {
         }
 
         Map<String, Object> reservation(String state) {
-            return Map.ofEntries(
+            var result = new HashMap<String, Object>(Map.ofEntries(
                     Map.entry("operationId", id),
                     Map.entry("reservationId", reservation),
                     Map.entry("sourceAccountId", a),
@@ -112,7 +115,9 @@ class SdkManagedFundsAdapterTest {
                             "expiresAt",
                             LocalDateTime.ofInstant(
                                             Instant.ofEpochMilli(deadline - 1000), ZoneOffset.UTC)
-                                    .toString()));
+                                    .toString())));
+            if ("REVERSED".equals(state)) result.put("reversalId", reversal);
+            return result;
         }
 
         View view() {
@@ -194,6 +199,25 @@ class SdkManagedFundsAdapterTest {
             assertThat(f.paths.getFirst()).contains(f.reservation.toString());
             assertThat(f.bodies.getFirst().get("actionId").asText()).isEqualTo(f.effect.toString());
             assertThat(f.bodies.getFirst().get("action").asText()).isEqualTo("COMMIT");
+        }
+    }
+
+    @Test
+    void reverseUsesSelectedParticipantAndItsOwnDelegatedScope() throws Exception {
+        try (var f = new Fixture()) {
+            var requested = new java.util.concurrent.atomic.AtomicReference<Set<String>>();
+            PaymentDelegationPort delegation = (audience, tenant, accounts, scopes) -> {
+                requested.set(scopes);
+                return Mono.just("synthetic-current");
+            };
+            var result = f.adapter(delegation).act("owned", f.claim(EffectKind.REVERSE)).block(WAIT);
+            assertThat(result.state()).isEqualTo("REVERSED");
+            assertThat(result.reversalId()).isEqualTo(f.reversal);
+            assertThat(requested.get()).containsExactly("funds:reverse");
+            assertThat(f.paths).hasSize(1);
+            assertThat(f.paths.getFirst()).contains(f.reservation.toString());
+            assertThat(f.bodies.getFirst().get("actionId").asText()).isEqualTo(f.effect.toString());
+            assertThat(f.bodies.getFirst().get("action").asText()).isEqualTo("REVERSE");
         }
     }
 

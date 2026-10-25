@@ -101,15 +101,18 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
     public Mono<ReservationObservation> act(String t, EffectClaim c) {
         return SdkManagedPaymentCoreAdapter.safe(
                 () -> {
-                    if (c.kind() != EffectKind.COMMIT && c.kind() != EffectKind.RELEASE
+                    if (c.kind() != EffectKind.COMMIT && c.kind() != EffectKind.RELEASE && c.kind() != EffectKind.REVERSE
                             || c.payment().reservationId() == null
                             || c.participantActionId() == null) return Mono.error(inconsistent());
                     return action(
                             t,
                             c,
-                            c.kind() == EffectKind.COMMIT
-                                    ? Command.ActionEnum.COMMIT
-                                    : Command.ActionEnum.RELEASE);
+                            switch (c.kind()) {
+                                case COMMIT -> Command.ActionEnum.COMMIT;
+                                case RELEASE -> Command.ActionEnum.RELEASE;
+                                case REVERSE -> Command.ActionEnum.REVERSE;
+                                default -> throw inconsistent();
+                            });
                 });
     }
 
@@ -118,6 +121,7 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
                 switch (action) {
                     case COMMIT -> "funds:commit";
                     case RELEASE -> "funds:release";
+                    case REVERSE -> "funds:reverse";
                     case EXPIRE -> "funds:expire";
                     default -> throw inconsistent();
                 };

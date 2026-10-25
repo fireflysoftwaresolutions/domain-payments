@@ -87,12 +87,14 @@ public class ManagedPaymentFlowServiceImpl implements ManagedPaymentFlowService 
                     case RESERVE -> "payments:create";
                     case COMMIT -> "payments:confirm";
                     case RELEASE -> "payments:cancel";
+                    case REVERSE -> "payments:reverse";
                     case OBSERVE -> "payments:recover";
                 };
         require(
                 call,
                 tenant,
-                call.principal().hasScope(original) ? original : "payments:recover",
+                claim.kind() == EffectKind.REVERSE || call.principal().hasScope(original)
+                        ? original : "payments:recover",
                 v.sourceAccountId(),
                 v.destinationAccountId());
         require(
@@ -102,6 +104,7 @@ public class ManagedPaymentFlowServiceImpl implements ManagedPaymentFlowService 
                     case RESERVE -> "funds:reserve";
                     case COMMIT -> "funds:commit";
                     case RELEASE -> "funds:release";
+                    case REVERSE -> "funds:reverse";
                     case OBSERVE -> "funds:read";
                 },
                 v.sourceAccountId(),
@@ -167,9 +170,11 @@ public class ManagedPaymentFlowServiceImpl implements ManagedPaymentFlowService 
                             || input.actionId() == null)
                         return Mono.error(fail(400, "EXACT_MANAGED_PAYMENT_DECISION_REQUIRED"));
                     String scope =
-                            input.kind() == DecisionKind.CONFIRM
-                                    ? "payments:confirm"
-                                    : "payments:cancel";
+                            switch (input.kind()) {
+                                case CONFIRM -> "payments:confirm";
+                                case CANCEL -> "payments:cancel";
+                                case REVERSE -> "payments:reverse";
+                            };
                     return bound(tenant, context, scope)
                             .flatMap(
                                     call ->
@@ -186,11 +191,11 @@ public class ManagedPaymentFlowServiceImpl implements ManagedPaymentFlowService 
                                                                 require(
                                                                         call,
                                                                         tenant,
-                                                                        input.kind()
-                                                                                        == DecisionKind
-                                                                                                .CONFIRM
-                                                                                ? "funds:commit"
-                                                                                : "funds:release",
+                                                                        switch (input.kind()) {
+                                                                            case CONFIRM -> "funds:commit";
+                                                                            case CANCEL -> "funds:release";
+                                                                            case REVERSE -> "funds:reverse";
+                                                                        },
                                                                         v.sourceAccountId(),
                                                                         v.destinationAccountId());
                                                                 return execute(
@@ -554,7 +559,7 @@ public class ManagedPaymentFlowServiceImpl implements ManagedPaymentFlowService 
                             return safe(() ->
                                             switch (claim.kind()) {
                                                 case RESERVE -> funds.reserve(tenant, claim);
-                                                case COMMIT, RELEASE -> funds.act(tenant, claim);
+                                                case COMMIT, RELEASE, REVERSE -> funds.act(tenant, claim);
                                                 case OBSERVE -> funds.observe(tenant, claim);
                                             })
                                     .thenReturn(work)
