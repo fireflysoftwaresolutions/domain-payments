@@ -37,7 +37,7 @@ public class ManagedPaymentExperienceSdkProbe {
 
     private static ManagedPaymentExperiencesApi client(String token) {
         var client = new ApiClient().setBasePath(System.getenv("OWNED_EXPERIENCE_URL"));
-        client.addDefaultHeader("Authorization", "Bearer " + token);
+        client.setBearerToken(token);
         return new ManagedPaymentExperiencesApi(client);
     }
 
@@ -81,7 +81,7 @@ public class ManagedPaymentExperienceSdkProbe {
                         && held.getCustomerNotAfterEpochMillis() == deadline,
                 "Typed actual held funds and exact original deadline");
         var read =
-                api.getManagedPaymentExperience("owned", held.getPaymentId(), null).block(TIMEOUT);
+                api.getManagedPaymentExperience("owned", held.getPaymentId()).block(TIMEOUT);
         check(
                 read != null
                         && read.getReservationId().equals(held.getReservationId())
@@ -100,7 +100,7 @@ public class ManagedPaymentExperienceSdkProbe {
         denied(() -> revoked.createManagedPaymentExperience("owned", input).block(TIMEOUT), 403);
         denied(
                 () ->
-                        revoked.getManagedPaymentExperience("owned", held.getPaymentId(), null)
+                        revoked.getManagedPaymentExperience("owned", held.getPaymentId())
                                 .block(TIMEOUT),
                 404);
         var cancelled =
@@ -153,27 +153,7 @@ public class ManagedPaymentExperienceSdkProbe {
                         && repeated.getVersion().equals(committed.getVersion())
                         && repeated.getPostingId().equals(committed.getPostingId()),
                 "Experience SDK decision replay retains actual posting once");
-        var ledgerClient =
-                new io.fireflysoftware.core.banking.ledger.sdk.invoker.ApiClient()
-                        .setBasePath(System.getenv("OWNED_LEDGER_URL"));
-        ledgerClient.addDefaultHeader(
-                "Authorization", "Bearer " + System.getenv("OWNED_EXPERIENCE_TOKEN"));
-        var ledger =
-                new io.fireflysoftware.core.banking.ledger.sdk.api.LedgerFundsApi(ledgerClient);
-        var reversal =
-                ledger.actOnFundsReservation(
-                                "owned",
-                                committed.getReservationId(),
-                                new io.fireflysoftware.core.banking.ledger.sdk.model.Command()
-                                        .actionId(UUID.randomUUID())
-                                        .action(
-                                                io.fireflysoftware.core.banking.ledger.sdk.model
-                                                        .Command.ActionEnum.REVERSE),
-                                null)
-                        .block(TIMEOUT);
-        if (reversal == null || reversal.getReversalId() == null)
-            throw new AssertionError("Actual privileged synthetic reversal required");
-        var observed =
+        var observedCommit =
                 api.recoverManagedPaymentExperience(
                                 "owned",
                                 committed.getPaymentId(),
@@ -182,14 +162,65 @@ public class ManagedPaymentExperienceSdkProbe {
                                         .expectedVersion(committed.getVersion()))
                         .block(TIMEOUT);
         check(
+                observedCommit != null
+                        && observedCommit.getState() == View.StateEnum.COMPLETED
+                        && observedCommit.getPostingId().equals(committed.getPostingId())
+                        && observedCommit.getReservationId().equals(committed.getReservationId())
+                        && observedCommit.getPendingEffectId() == null,
+                "Experience recovery observes the original committed owner through domain and core");
+        var reverseDecision =
+                new Decision()
+                        .actionId(UUID.randomUUID())
+                        .kind(Decision.KindEnum.REVERSE)
+                        .expectedVersion(observedCommit.getVersion());
+        var reversal =
+                api.decideManagedPaymentExperience("owned", committed.getPaymentId(), reverseDecision)
+                        .block(TIMEOUT);
+        check(
+                reversal != null
+                        && reversal.getState() == View.StateEnum.REVERSED
+                        && reversal.getPaymentId().equals(committed.getPaymentId())
+                        && reversal.getReservationId().equals(committed.getReservationId())
+                        && reversal.getPostingId().equals(committed.getPostingId())
+                        && reversal.getReversalId() != null
+                        && !reversal.getReversalId().equals(committed.getPostingId())
+                        && reversal.getNotAfterEpochMillis().equals(committed.getNotAfterEpochMillis())
+                        && reversal.getPendingEffectId() == null,
+                "Genuine experience REVERSE traverses domain and core with original posting");
+        var reverseReplay =
+                api.decideManagedPaymentExperience("owned", committed.getPaymentId(), reverseDecision)
+                        .block(TIMEOUT);
+        check(
+                reverseReplay != null
+                        && reverseReplay.getState() == View.StateEnum.REVERSED
+                        && reverseReplay.getVersion().equals(reversal.getVersion())
+                        && reverseReplay.getPostingId().equals(committed.getPostingId())
+                        && reverseReplay.getReversalId().equals(reversal.getReversalId())
+                        && reverseReplay.getPendingEffectId() == null,
+                "Same experience reverse action replays one retained reversal");
+        denied(
+                () ->
+                        api.recoverManagedPaymentExperience(
+                                        "owned",
+                                        committed.getPaymentId(),
+                                        new Recovery()
+                                                .actionId(UUID.randomUUID())
+                                                .expectedVersion(reversal.getVersion()))
+                                .block(TIMEOUT),
+                409);
+        var observed =
+                api.getManagedPaymentExperience("owned", committed.getPaymentId())
+                        .block(TIMEOUT);
+        check(
                 observed != null
                         && observed.getState() == View.StateEnum.REVERSED
+                        && observed.getVersion().equals(reversal.getVersion())
                         && observed.getPostingId().equals(committed.getPostingId())
                         && observed.getReversalId().equals(reversal.getReversalId()),
-                "Genuine experience SDK recovery preserves distinct actual reversal");
+                "Terminal reversal refuses invented recovery and preserves actual owner evidence");
         var timeline =
                 api.getManagedPaymentExperienceHistory(
-                                "owned", committed.getPaymentId(), -1L, 25, null)
+                                "owned", committed.getPaymentId(), -1L, 25)
                         .block(TIMEOUT);
         check(
                 timeline != null
@@ -213,13 +244,13 @@ public class ManagedPaymentExperienceSdkProbe {
         denied(
                 () ->
                         revoked.getManagedPaymentExperienceHistory(
-                                        "owned", committed.getPaymentId(), -1L, 25, null)
+                                        "owned", committed.getPaymentId(), -1L, 25)
                                 .block(TIMEOUT),
                 404);
         denied(
                 () ->
                         api.getManagedPaymentExperienceHistory(
-                                        "owned", committed.getPaymentId(), -1L, 101, null)
+                                        "owned", committed.getPaymentId(), -1L, 101)
                                 .block(TIMEOUT),
                 400);
         System.out.println("OWNED_EXPERIENCE_SDK_ASSERTIONS=" + checks);

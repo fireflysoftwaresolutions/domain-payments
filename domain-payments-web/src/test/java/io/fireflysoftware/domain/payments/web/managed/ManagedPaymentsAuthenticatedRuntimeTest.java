@@ -51,6 +51,7 @@ import java.util.*;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
             "server.address=127.0.0.1",
+            "firefly.cache.default-cache-type=CAFFEINE",
             "firefly.eda.enabled=false",
             "firefly.stepevents.enabled=false",
             "firefly.web.idempotency.enabled=true"
