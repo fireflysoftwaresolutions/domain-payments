@@ -18,37 +18,9 @@ package io.fireflysoftware.domain.payments.sca;
 
 import java.util.UUID;
 
-/**
- * Asks core-common-sca-mgmt to create and validate the challenge, then hands the core's code
- * to {@link ChallengeDeliveryPort}. This service does not store challenges.
- */
-public final class ScaChallengeService {
-
-    private final CoreScaClient core;
-    private final ChallengeDeliveryPort delivery;
-
-    public ScaChallengeService(CoreScaClient core, ChallengeDeliveryPort delivery) {
-        this.core = core;
-        this.delivery = delivery;
-    }
-
-    public Issued create(UUID paymentId, UUID partyId) {
-        CoreScaClient.CreatedChallenge created = core.create(paymentId, partyId);
-        ChallengeDeliveryPort.Delivery delivered = delivery.deliver(created.challengeId(), created.challengeCode());
-        return new Issued(created.operationId(), delivered.challengeId(), delivered.challengeValue());
-    }
-
-    public ChallengeStatus validate(UUID operationId, UUID challengeId, String response) {
-        if ("sandbox".equals(response)) {
-            return ChallengeStatus.FAILED;
-        }
-        return core.validate(operationId, challengeId, response) ? ChallengeStatus.VALIDATED : ChallengeStatus.FAILED;
-    }
-
-    public void expire(UUID operationId, UUID challengeId) {
-        core.expire(operationId, challengeId);
-    }
-
-    public record Issued(UUID operationId, UUID challengeId, String challengeValue) {
-    }
+public interface ScaChallengeService {
+    Issued create(UUID paymentId, UUID partyId);
+    ChallengeStatus validate(UUID operationId, UUID challengeId, String response);
+    void expire(UUID operationId, UUID challengeId);
+    record Issued(UUID operationId, UUID challengeId, String challengeValue) {}
 }

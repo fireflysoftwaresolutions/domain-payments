@@ -20,8 +20,8 @@ import java.util.UUID;
 
 /**
  * Create and validate against core-common-sca-mgmt, which stores the challenge.
- * {@link SdkCoreScaClient} is the live client and uses {@code core-common-sca-mgmt-sdk}.
- * {@link SandboxCoreScaClient} replaces it only when no core process is running.
+ * {@link SdkCoreScaClientImpl} is the live client and uses {@code core-common-sca-mgmt-sdk}.
+ * {@link SandboxCoreScaClientImpl} replaces it only when no core process is running.
  */
 public interface CoreScaClient {
 

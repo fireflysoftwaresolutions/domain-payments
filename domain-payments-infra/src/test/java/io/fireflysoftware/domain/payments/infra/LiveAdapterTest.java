@@ -46,7 +46,7 @@ class LiveAdapterTest {
             }
             return Mono.empty();
         });
-        LibraryPaymentRailAdapter adapter = new LibraryPaymentRailAdapter(rails);
+        LibraryPaymentRailAdapterImpl adapter = new LibraryPaymentRailAdapterImpl(rails);
         SyncResult result = adapter.sendOutbound(new OutboundInstruction("swift-1", new BigDecimal("10.00"), "EUR",
                 UUID.randomUUID(), "Customer", "Beneficiary", "DE89370400440532013000", "COBADEFFXXX",
                 RailKind.SWIFT, null, UUID.randomUUID()));
