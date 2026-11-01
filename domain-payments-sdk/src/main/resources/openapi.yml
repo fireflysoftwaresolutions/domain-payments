@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: domain-payments API
   description: Durable payment orchestration domain
@@ -11,8 +11,8 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0
   version: 1.0.0
 servers:
-- url: http://localhost:18080
-  description: Generated server url
+- url: http://localhost:58577
+  description: Local Development Server
 tags:
 - name: Payments
   description: "Try, confirm, and cancel a payment"
@@ -1104,6 +1104,7 @@ components:
   schemas:
     Create:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -1124,7 +1125,6 @@ components:
         customerNotAfterEpochMillis:
           type: integer
           format: int64
-      additionalProperties: false
     View:
       type: object
       properties:
@@ -1209,6 +1209,7 @@ components:
           format: date-time
     Recovery:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -1216,9 +1217,9 @@ components:
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     Decision:
       type: object
+      additionalProperties: false
       properties:
         actionId:
           type: string
@@ -1232,7 +1233,6 @@ components:
         expectedVersion:
           type: integer
           format: int64
-      additionalProperties: false
     Confirmation:
       type: object
       properties:
@@ -1439,8 +1439,7 @@ components:
       properties:
         input:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: {}
         correlationId:
           type: string
         triggeredBy:
@@ -1636,8 +1635,7 @@ components:
         fireAt:
           type: string
           format: date-time
-        data:
-          type: object
+        data: {}
         ready:
           type: boolean
     DeadLetterEntryDto:
