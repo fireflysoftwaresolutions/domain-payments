@@ -48,13 +48,15 @@ public class ManagedPaymentExperienceSdkProbe {
         } catch (WebClientResponseException error) {
             check(
                     error.getStatusCode().value() == status,
-                    "Exact current-authority/conflict status" + status);
+                    "Exact current-authority/conflict status" + status
+                            + " observed" + error.getStatusCode().value());
         }
     }
 
     public static void main(String[] arguments) {
         var api = client(System.getenv("OWNED_EXPERIENCE_TOKEN"));
         var revoked = client(System.getenv("OWNED_REVOKED_TOKEN"));
+        var unbounded = client(System.getenv("OWNED_UNBOUNDED_TOKEN"));
         var deadline = System.currentTimeMillis() + 120000;
         var input =
                 new Create()
@@ -98,6 +100,11 @@ public class ManagedPaymentExperienceSdkProbe {
         denied(() -> api.createManagedPaymentExperience("owned", input).block(TIMEOUT), 409);
         input.ttlSeconds(300);
         denied(() -> revoked.createManagedPaymentExperience("owned", input).block(TIMEOUT), 403);
+        denied(() -> unbounded.createManagedPaymentExperience("owned", input).block(TIMEOUT), 403);
+        denied(
+                () -> unbounded.getManagedPaymentExperience("owned", held.getPaymentId())
+                        .block(TIMEOUT),
+                403);
         denied(
                 () ->
                         revoked.getManagedPaymentExperience("owned", held.getPaymentId())
