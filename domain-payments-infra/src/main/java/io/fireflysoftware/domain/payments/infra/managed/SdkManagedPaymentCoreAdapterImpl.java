@@ -32,12 +32,12 @@ import java.time.*;
 import java.util.*;
 import java.util.function.*;
 
-public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePort {
+public final class SdkManagedPaymentCoreAdapterImpl implements ManagedPaymentCorePort {
     private final PaymentDelegationPort delegation;
     private final String base, audience;
     private final boolean loopback;
 
-    public SdkManagedPaymentCoreAdapter(
+    public SdkManagedPaymentCoreAdapterImpl(
             PaymentDelegationPort delegation, String base, String audience, boolean loopback) {
         this.delegation = delegation;
         this.base = base;
@@ -129,7 +129,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                 () ->
                         existing(t, "payments:read")
                                 .flatMap(api -> api.getManagedPayment(t, id, null))
-                                .map(SdkManagedPaymentCoreAdapter::view));
+                                .map(SdkManagedPaymentCoreAdapterImpl::view));
     }
 
     public Mono<EffectClaim> claim(String t, UUID id, Claim in) {
@@ -174,7 +174,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                                                 .fence(in.fence())
                                                                 .expectedVersion(
                                                                         in.expectedVersion())))
-                                .map(SdkManagedPaymentCoreAdapter::view));
+                                .map(SdkManagedPaymentCoreAdapterImpl::view));
     }
 
     public Mono<View> failure(String t, UUID id, Failure in) {
@@ -198,7 +198,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                                                                 .sdk.model.Failure
                                                                                 .CodeEnum.fromValue(
                                                                                 in.code().name()))))
-                                .map(SdkManagedPaymentCoreAdapter::view));
+                                .map(SdkManagedPaymentCoreAdapterImpl::view));
     }
 
     public Mono<View> decide(String t, UUID id, Decision in) {
@@ -226,7 +226,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                                                                 in.kind().name()))
                                                                 .expectedVersion(
                                                                         in.expectedVersion())))
-                                .map(SdkManagedPaymentCoreAdapter::view));
+                                .map(SdkManagedPaymentCoreAdapterImpl::view));
     }
 
     public Mono<View> recover(String t, UUID id, Recovery in) {
@@ -243,7 +243,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                                                 .actionId(in.actionId())
                                                                 .expectedVersion(
                                                                         in.expectedVersion())))
-                                .map(SdkManagedPaymentCoreAdapter::view));
+                                .map(SdkManagedPaymentCoreAdapterImpl::view));
     }
 
     public Mono<RecoveryPage> queue(String t, UUID after, int limit) {
@@ -259,7 +259,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                                 new RecoveryPage(
                                                         p.getItems().stream()
                                                                 .map(
-                                                                        SdkManagedPaymentCoreAdapter
+                                                                        SdkManagedPaymentCoreAdapterImpl
                                                                                 ::view)
                                                                 .toList(),
                                                         p.getNextId())));
@@ -281,7 +281,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
                                         e.getPostingId(),
                                         e.getReversalId()))
                 .timeout(Duration.ofSeconds(10))
-                .onErrorMap(SdkManagedPaymentCoreAdapter::sanitize);
+                .onErrorMap(SdkManagedPaymentCoreAdapterImpl::sanitize);
     }
 
     static View view(io.fireflysoftware.core.banking.payments.sdk.model.View v) {
@@ -321,7 +321,7 @@ public final class SdkManagedPaymentCoreAdapter implements ManagedPaymentCorePor
         return Mono.defer(call)
                 .switchIfEmpty(Mono.error(fail(503, "EMPTY_PAYMENT_CORE_RECEIPT")))
                 .timeout(Duration.ofSeconds(15))
-                .onErrorMap(SdkManagedPaymentCoreAdapter::sanitize);
+                .onErrorMap(SdkManagedPaymentCoreAdapterImpl::sanitize);
     }
 
     static ResponseStatusException sanitize(Throwable e) {

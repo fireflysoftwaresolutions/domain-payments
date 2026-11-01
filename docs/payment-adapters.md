@@ -11,7 +11,7 @@ firefly:
     configuration: sandbox
 ```
 
-This selects in-process ledger, account-position, payment-record, rail and PSP adapters, the synthetic routing catalog, a no-socket `SandboxCoreScaClient`, and `SandboxChallengeDeliveryAdapter`. No SCA URL is needed in this mode. The challenge is generated per request and returned in the response so a developer can complete a local demonstration. The literal response `sandbox` is rejected.
+This selects in-process ledger, account-position, payment-record, rail and PSP adapters, the synthetic routing catalog, a no-socket `SandboxCoreScaClientImpl`, and `SandboxChallengeDeliveryAdapterImpl`. No SCA URL is needed in this mode. The challenge is generated per request and returned in the response so a developer can complete a local demonstration. The literal response `sandbox` is rejected.
 
 These adapters keep process-local state. Restarting the application loses sessions, holds, challenges and synthetic records. Their confirmation and `thirdPartySynced` results describe simulation inside this process. They do not establish a bank balance, durable reservation, rail settlement, notification delivery or external SCA result. Use synthetic identifiers and private loopback access.
 
@@ -30,12 +30,12 @@ They are fixture values, not records provisioned in a remote service. Submit `DO
 
 | Boundary | Sandbox selection | Live selection |
 | --- | --- | --- |
-| Ledger | `SandboxLedgerAdapter` | `SdkLedgerAdapter`, core ledger SDK |
-| Account position | `SandboxAccountPositionAdapter` | `SdkAccountPositionAdapter`, **core banking accounts** SDK |
-| Payment record | `SandboxPaymentRecordAdapter` | `SdkPaymentRecordAdapter`, core payment SDK |
-| Payment rail | `SandboxPaymentRailAdapter` | `LibraryPaymentRailAdapter`, deployment-provided rail library port |
-| PSP | `SandboxPspAdapter` | `LibraryPspAdapter`, deployment-provided payment, payout and refund ports |
-| SCA storage/validation | `SandboxCoreScaClient` | `SdkCoreScaClient`, core SCA SDK |
+| Ledger | `SandboxLedgerAdapterImpl` | `SdkLedgerAdapterImpl`, core ledger SDK |
+| Account position | `SandboxAccountPositionAdapterImpl` | `SdkAccountPositionAdapterImpl`, **core banking accounts** SDK |
+| Payment record | `SandboxPaymentRecordAdapterImpl` | `SdkPaymentRecordAdapterImpl`, core payment SDK |
+| Payment rail | `SandboxPaymentRailAdapterImpl` | `LibraryPaymentRailAdapterImpl`, deployment-provided rail library port |
+| PSP | `SandboxPspAdapterImpl` | `LibraryPspAdapterImpl`, deployment-provided payment, payout and refund ports |
+| SCA storage/validation | `SandboxCoreScaClientImpl` | `SdkCoreScaClientImpl`, core SCA SDK |
 | Challenge delivery | Synthetic in-process inbox | Explicit deployment-provided `ChallengeDeliveryPort` |
 | Routing and masters | In-process synthetic catalog | Configuration and masters SDKs, selected separately |
 

@@ -24,10 +24,10 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-public class ManagedPaymentDelegationAdapter implements PaymentDelegationPort {
+public class ManagedPaymentDelegationAdapterImpl implements PaymentDelegationPort {
     private final String mode;
 
-    public ManagedPaymentDelegationAdapter(String mode) {
+    public ManagedPaymentDelegationAdapterImpl(String mode) {
         this.mode = mode;
     }
 

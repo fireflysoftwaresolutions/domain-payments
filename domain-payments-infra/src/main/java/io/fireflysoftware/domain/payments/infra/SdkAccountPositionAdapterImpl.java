@@ -38,7 +38,7 @@ import java.util.UUID;
  * Space movement calls {@code AccountSpacesApi#transferBetweenSpaces}.
  * Selected when {@code firefly.payments.mode=live}. The sandbox adapter stays the default.
  */
-public final class SdkAccountPositionAdapter implements AccountPositionPort {
+public final class SdkAccountPositionAdapterImpl implements AccountPositionPort {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
@@ -46,13 +46,13 @@ public final class SdkAccountPositionAdapter implements AccountPositionPort {
     private final AccountSpacesApi spaces;
     private final java.util.concurrent.ConcurrentHashMap<String, PositionMovement> applied = new java.util.concurrent.ConcurrentHashMap<>();
 
-    public SdkAccountPositionAdapter(String baseUrl) {
+    public SdkAccountPositionAdapterImpl(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
         this(new AccountBalancesApi(client), new AccountSpacesApi(client));
     }
 
-    SdkAccountPositionAdapter(AccountBalancesApi balances, AccountSpacesApi spaces) {
+    SdkAccountPositionAdapterImpl(AccountBalancesApi balances, AccountSpacesApi spaces) {
         this.balances = balances;
         this.spaces = spaces;
     }

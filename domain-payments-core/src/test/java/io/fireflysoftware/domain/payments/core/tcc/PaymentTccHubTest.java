@@ -27,12 +27,12 @@ import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
 import io.fireflysoftware.domain.payments.core.routing.SchemeRouter;
 import io.fireflysoftware.domain.payments.core.sandbox.SandboxCatalog;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapterImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,16 +55,16 @@ class PaymentTccHubTest {
     private static final UUID DESTINATION = UUID.fromString("10000000-0000-4000-8000-000000000012");
     private static final BigDecimal AMOUNT = new BigDecimal("25.00");
 
-    private SandboxLedgerAdapter ledger;
-    private SandboxPaymentRailAdapter rail;
+    private SandboxLedgerAdapterImpl ledger;
+    private SandboxPaymentRailAdapterImpl rail;
     private PaymentTccService hub;
 
     @BeforeEach
     void setUp() {
-        ledger = new SandboxLedgerAdapter();
-        rail = new SandboxPaymentRailAdapter();
-        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
-                rail, new SandboxPspAdapter(), new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        ledger = new SandboxLedgerAdapterImpl();
+        rail = new SandboxPaymentRailAdapterImpl();
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapterImpl(),
+                rail, new SandboxPspAdapterImpl(), new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
     }
 
     @Test
@@ -133,9 +133,9 @@ class PaymentTccHubTest {
 
     @Test
     void internationalOutboundConfirmsOnTheRailNotThePsp() {
-        SandboxPspAdapter psp = new SandboxPspAdapter();
-        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
-                rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        SandboxPspAdapterImpl psp = new SandboxPspAdapterImpl();
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapterImpl(),
+                rail, psp, new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
         MovementResult tried = hub.tryPayment(command(PaymentScheme.INTERNATIONAL_OUTBOUND, "swift-1", SOURCE, null));
         MovementResult confirmed = hub.confirm(tried.paymentId(), tried.challengeValue());
         assertEquals(MovementRoute.OUTBOUND_RAIL, confirmed.route());
@@ -173,9 +173,9 @@ class PaymentTccHubTest {
 
     @Test
     void cardCollectionUsesThePspAndACreditTransferDoesNot() {
-        SandboxPspAdapter psp = new SandboxPspAdapter();
-        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(),
-                rail, psp, new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        SandboxPspAdapterImpl psp = new SandboxPspAdapterImpl();
+        hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapterImpl(),
+                rail, psp, new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
         MovementResult card = hub.tryPayment(inbound(PaymentScheme.PSP_INBOUND, "card-ref-1"));
         hub.confirm(card.paymentId(), null);
         assertEquals(1, psp.inboundCalls());

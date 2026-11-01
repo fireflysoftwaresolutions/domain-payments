@@ -18,7 +18,7 @@ package io.fireflysoftware.domain.payments.web.managed;
 
 import io.fireflysoftware.domain.payments.core.managed.ManagedPaymentContext;
 import io.fireflysoftware.domain.payments.core.managed.ports.ManagedPaymentWorkerActorPort;
-import io.fireflysoftware.domain.payments.infra.managed.OAuthManagedPaymentWorkerActorAdapter;
+import io.fireflysoftware.domain.payments.infra.managed.OAuthManagedPaymentWorkerActorAdapterImpl;
 import io.fireflysoftware.domain.payments.web.managed.ManagedPaymentWorkerWiring.RecoveryProperties;
 
 import org.fireflyframework.security.rs.AccessTokenValidators;
@@ -63,7 +63,7 @@ public class ManagedPaymentWorkerActorAutoConfiguration {
                                     503, "NATIVE_WORKER_CLIENT_CREDENTIALS_REQUIRED"));
         var decoder = NimbusReactiveJwtDecoder.withJwkSetUri(jwks).build();
         decoder.setJwtValidator(AccessTokenValidators.forIssuerAndAudience(issuer, audience));
-        return new OAuthManagedPaymentWorkerActorAdapter(
+        return new OAuthManagedPaymentWorkerActorAdapterImpl(
                 manager, repository, decoder, p.getRegistrations(), loopback);
     }
 }

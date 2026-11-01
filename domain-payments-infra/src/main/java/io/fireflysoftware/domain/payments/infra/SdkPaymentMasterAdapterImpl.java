@@ -33,19 +33,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Reads ISO currency codes from core-common-reference-master-data through its SDK. */
-public final class SdkPaymentMasterAdapter implements PaymentMasterPort {
+public final class SdkPaymentMasterAdapterImpl implements PaymentMasterPort {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     private final CurrenciesApi currencies;
 
-    public SdkPaymentMasterAdapter(String baseUrl) {
+    public SdkPaymentMasterAdapterImpl(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
         this(new CurrenciesApi(client));
     }
 
-    SdkPaymentMasterAdapter(CurrenciesApi currencies) {
+    SdkPaymentMasterAdapterImpl(CurrenciesApi currencies) {
         this.currencies = currencies;
     }
 

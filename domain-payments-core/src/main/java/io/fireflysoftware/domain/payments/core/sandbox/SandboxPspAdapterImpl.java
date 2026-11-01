@@ -27,7 +27,7 @@ import io.fireflysoftware.domain.payments.core.ports.PspPort;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class SandboxPspAdapter implements PspPort {
+public final class SandboxPspAdapterImpl implements PspPort {
 
     private final AtomicInteger outboundCalls = new AtomicInteger();
     private final AtomicInteger inboundCalls = new AtomicInteger();
@@ -48,7 +48,7 @@ public final class SandboxPspAdapter implements PspPort {
             throw new PaymentFlowException(PaymentFailure.ROUTE_NOT_CONFIGURED,
                     "An outbound PSP movement uses the payout instrument.");
         }
-        return SyncResult.accepted(SandboxPaymentRailAdapter.reference(instruction.idempotencyKey()));
+        return SyncResult.accepted(SandboxPaymentRailAdapterImpl.reference(instruction.idempotencyKey()));
     }
 
     @Override

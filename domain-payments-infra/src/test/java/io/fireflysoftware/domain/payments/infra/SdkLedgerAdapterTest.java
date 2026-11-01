@@ -91,7 +91,7 @@ class SdkLedgerAdapterTest {
         });
         when(postings.releaseLedgerPosting(any(), any())).thenReturn(Mono.error(WebClientResponseException.create(
                 409, "Conflict", HttpHeaders.EMPTY, new byte[0], StandardCharsets.UTF_8)));
-        SdkLedgerAdapter adapter = new SdkLedgerAdapter(transactions, legs, postings);
+        SdkLedgerAdapterImpl adapter = new SdkLedgerAdapterImpl(transactions, legs, postings);
         UUID debit = UUID.randomUUID();
         UUID credit = UUID.randomUUID();
         List<LedgerLeg> pair = List.of(

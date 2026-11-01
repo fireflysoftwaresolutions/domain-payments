@@ -62,7 +62,7 @@ class ManagedPaymentDelegationAdapterTest {
         assertDenied(
                 () ->
                         run(
-                                new ManagedPaymentDelegationAdapter("unconfigured")
+                                new ManagedPaymentDelegationAdapterImpl("unconfigured")
                                         .token(
                                                 "payments",
                                                 "owned",
@@ -70,7 +70,7 @@ class ManagedPaymentDelegationAdapterTest {
                                                 Set.of("payments:read")),
                                 actor),
                 503);
-        var adapter = new ManagedPaymentDelegationAdapter("validated-multi-audience");
+        var adapter = new ManagedPaymentDelegationAdapterImpl("validated-multi-audience");
         assertThat(
                         run(
                                 adapter.token(

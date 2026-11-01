@@ -35,14 +35,14 @@ import java.util.*;
 /**
  * Uses native client credentials and verifies the returned signed service identity on every use.
  */
-public final class OAuthManagedPaymentWorkerActorAdapter implements ManagedPaymentWorkerActorPort {
+public final class OAuthManagedPaymentWorkerActorAdapterImpl implements ManagedPaymentWorkerActorPort {
     private final ReactiveOAuth2AuthorizedClientManager manager;
     private final ReactiveClientRegistrationRepository registrations;
     private final ReactiveJwtDecoder decoder;
     private final Map<String, String> tenantRegistrations;
     private final boolean loopback;
 
-    public OAuthManagedPaymentWorkerActorAdapter(
+    public OAuthManagedPaymentWorkerActorAdapterImpl(
             ReactiveOAuth2AuthorizedClientManager manager,
             ReactiveClientRegistrationRepository registrations,
             ReactiveJwtDecoder decoder,
@@ -88,7 +88,7 @@ public final class OAuthManagedPaymentWorkerActorAdapter implements ManagedPayme
                                                                                 .getAuthorizationGrantType())
                                                         || config.getClientId() == null
                                                         || config.getClientId().isBlank()
-                                                        || !SdkManagedPaymentCoreAdapter.valid(
+                                                        || !SdkManagedPaymentCoreAdapterImpl.valid(
                                                                 config.getProviderDetails()
                                                                         .getTokenUri(),
                                                                 loopback))

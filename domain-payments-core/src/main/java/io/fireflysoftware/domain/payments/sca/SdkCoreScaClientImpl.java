@@ -33,7 +33,7 @@ import java.util.UUID;
  * Live SCA client. Creates the operation and challenge, and validates the response,
  * through {@code core-common-sca-mgmt-sdk}. This class does not keep a challenge store.
  */
-public final class SdkCoreScaClient implements CoreScaClient {
+public final class SdkCoreScaClientImpl implements CoreScaClient {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
@@ -41,15 +41,15 @@ public final class SdkCoreScaClient implements CoreScaClient {
     private final ScaChallengeControllerApi challenges;
     private final SecureRandom random = new SecureRandom();
 
-    public SdkCoreScaClient(ScaOperationControllerApi operations, ScaChallengeControllerApi challenges) {
+    public SdkCoreScaClientImpl(ScaOperationControllerApi operations, ScaChallengeControllerApi challenges) {
         this.operations = operations;
         this.challenges = challenges;
     }
 
-    public static SdkCoreScaClient at(String baseUrl) {
+    public static SdkCoreScaClientImpl at(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
-        return new SdkCoreScaClient(new ScaOperationControllerApi(client), new ScaChallengeControllerApi(client));
+        return new SdkCoreScaClientImpl(new ScaOperationControllerApi(client), new ScaChallengeControllerApi(client));
     }
 
     @Override

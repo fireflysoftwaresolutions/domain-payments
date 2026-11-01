@@ -95,7 +95,7 @@ class SdkManagedPaymentCoreAdapterTest {
             PaymentDelegationPort tokens =
                     (aud, t, accounts, scopes) -> Mono.just("synthetic-current-token");
             var adapter =
-                    new SdkManagedPaymentCoreAdapter(
+                    new SdkManagedPaymentCoreAdapterImpl(
                             tokens,
                             "http://127.0.0.1:" + server.getAddress().getPort(),
                             "core",
@@ -148,7 +148,7 @@ class SdkManagedPaymentCoreAdapterTest {
                 requested.set(scopes);
                 return Mono.just("synthetic-current-token");
             };
-            var adapter = new SdkManagedPaymentCoreAdapter(tokens,
+            var adapter = new SdkManagedPaymentCoreAdapterImpl(tokens,
                     "http://127.0.0.1:" + server.getAddress().getPort(), "core", true);
             var decision = new Decision(action, DecisionKind.REVERSE, 8L);
             var actor = fixture.actor(Set.of("core"), Set.of("payments:reverse"), Instant.now().plusSeconds(60));
@@ -178,7 +178,7 @@ class SdkManagedPaymentCoreAdapterTest {
         server.start();
         try {
             var adapter =
-                    new SdkManagedPaymentCoreAdapter(
+                    new SdkManagedPaymentCoreAdapterImpl(
                             (aud, t, accounts, scopes) -> Mono.just("synthetic-current-token"),
                             "http://127.0.0.1:" + server.getAddress().getPort(),
                             "core",
@@ -218,7 +218,7 @@ class SdkManagedPaymentCoreAdapterTest {
                         "https://user:password@example.com",
                         "https://example.com?credential=secret")) {
             var delegation = org.mockito.Mockito.mock(PaymentDelegationPort.class);
-            var adapter = new SdkManagedPaymentCoreAdapter(delegation, url, "core", false);
+            var adapter = new SdkManagedPaymentCoreAdapterImpl(delegation, url, "core", false);
             assertThatThrownBy(
                             () ->
                                     adapter.create(

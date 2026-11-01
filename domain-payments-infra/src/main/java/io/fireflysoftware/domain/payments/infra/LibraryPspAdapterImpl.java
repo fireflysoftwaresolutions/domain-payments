@@ -47,13 +47,13 @@ import java.util.Locale;
  * Live PSP adapter. Outbound uses {@code PayoutPort}. Card collection uses {@code PaymentPort}.
  * A credit transfer is not sent here. Compensation uses {@code cancelPayout} or {@code createRefund}.
  */
-public final class LibraryPspAdapter implements PspPort {
+public final class LibraryPspAdapterImpl implements PspPort {
 
     private final PaymentPort payments;
     private final PayoutPort payouts;
     private final RefundPort refunds;
 
-    public LibraryPspAdapter(PaymentPort payments, PayoutPort payouts, RefundPort refunds) {
+    public LibraryPspAdapterImpl(PaymentPort payments, PayoutPort payouts, RefundPort refunds) {
         this.payments = payments;
         this.payouts = payouts;
         this.refunds = refunds;

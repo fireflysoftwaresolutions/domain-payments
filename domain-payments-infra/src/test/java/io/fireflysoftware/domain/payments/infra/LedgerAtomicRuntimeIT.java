@@ -9,11 +9,11 @@ import io.fireflysoftware.domain.payments.MovementCommand;
 import io.fireflysoftware.domain.payments.PaymentFlowException;
 import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapterImpl;
 import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
 import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import org.junit.jupiter.api.AfterAll;
@@ -106,13 +106,13 @@ class LedgerAtomicRuntimeIT {
     void aFreshCoreProcessAndAdapterConfirmTheOriginalPersistedHold() throws Exception {
         String key = UUID.randomUUID().toString();
         var entries = pair(new BigDecimal("123456789012345.670000000000000001"));
-        var held = new SdkLedgerAdapter(baseUrl()).hold(key, entries);
+        var held = new SdkLedgerAdapterImpl(baseUrl()).hold(key, entries);
         stopCore();
         startCore();
-        var confirmed = new SdkLedgerAdapter(baseUrl()).confirmHold(key);
+        var confirmed = new SdkLedgerAdapterImpl(baseUrl()).confirmHold(key);
         assertThat(confirmed.transactionId()).isEqualTo(held.transactionId());
         assertMoney(entries, confirmed.legs());
-        assertMoney(entries, new SdkLedgerAdapter(baseUrl()).confirmHold(key).legs());
+        assertMoney(entries, new SdkLedgerAdapterImpl(baseUrl()).confirmHold(key).legs());
         assertThat(count("SELECT count(*) FROM transaction WHERE external_reference='" + key + "' AND transaction_status='posted'")).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM transaction_status_history WHERE transaction_id='" + held.transactionId() + "'")).isEqualTo(2);
     }
@@ -122,12 +122,12 @@ class LedgerAtomicRuntimeIT {
         String key = UUID.randomUUID().toString();
         var entries = pair(new BigDecimal("10.25"));
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            var requests = java.util.stream.IntStream.range(0, 8).mapToObj(i -> executor.submit(() -> new SdkLedgerAdapter(baseUrl()).post(key, entries))).toList();
+            var requests = java.util.stream.IntStream.range(0, 8).mapToObj(i -> executor.submit(() -> new SdkLedgerAdapterImpl(baseUrl()).post(key, entries))).toList();
             var ids = new java.util.HashSet<UUID>();
             for (var request : requests) ids.add(request.get(30, TimeUnit.SECONDS).transactionId());
             assertThat(ids).hasSize(1);
         }
-        assertThatThrownBy(() -> new SdkLedgerAdapter(baseUrl()).post(key, pair(new BigDecimal("99.99"))))
+        assertThatThrownBy(() -> new SdkLedgerAdapterImpl(baseUrl()).post(key, pair(new BigDecimal("99.99"))))
                 .isInstanceOf(PaymentFlowException.class);
         assertThat(count("SELECT count(*) FROM transaction WHERE external_reference='" + key + "' AND total_amount=10.25")).isEqualTo(1);
     }
@@ -135,11 +135,11 @@ class LedgerAtomicRuntimeIT {
     @Test
     void actualTccRejectionAppendsOneAuthoritativeReversalAndPreservesOriginalMoney() throws Exception {
         String key = UUID.randomUUID().toString();
-        var ledger = new SdkLedgerAdapter(baseUrl());
-        var rail = new SandboxPaymentRailAdapter();
+        var ledger = new SdkLedgerAdapterImpl(baseUrl());
+        var rail = new SandboxPaymentRailAdapterImpl();
         rail.rejectOutbound(key);
-        var hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapter(), rail, new SandboxPspAdapter(),
-                new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        var hub = PaymentTccServiceImpl.sandbox(ledger, new SandboxPaymentRecordAdapterImpl(), rail, new SandboxPspAdapterImpl(),
+                new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
         var entries = pair(new BigDecimal("25.00"));
         var command = new MovementCommand(PaymentScheme.INTERNATIONAL_OUTBOUND, key, new BigDecimal("25.00"), "EUR",
                 UUID.randomUUID(), UUID.randomUUID(), entries.getFirst().accountId(), null, null, null, null,
@@ -147,9 +147,9 @@ class LedgerAtomicRuntimeIT {
         var tried = hub.tryPayment(command);
         var cancelled = hub.confirm(tried.paymentId(), tried.challengeValue());
         assertThat(cancelled.phase()).isEqualTo(PaymentPhase.CANCELLED);
-        var original = new SdkLedgerAdapter(baseUrl()).findByIdempotencyKey(key).orElseThrow();
-        var reversal = new SdkLedgerAdapter(baseUrl()).findByIdempotencyKey(key + ":reversal").orElseThrow();
-        var replay = new SdkLedgerAdapter(baseUrl()).reverse(original, key + ":reversal");
+        var original = new SdkLedgerAdapterImpl(baseUrl()).findByIdempotencyKey(key).orElseThrow();
+        var reversal = new SdkLedgerAdapterImpl(baseUrl()).findByIdempotencyKey(key + ":reversal").orElseThrow();
+        var replay = new SdkLedgerAdapterImpl(baseUrl()).reverse(original, key + ":reversal");
         assertThat(replay.transactionId()).isEqualTo(reversal.transactionId());
         assertThat(count("SELECT count(*) FROM transaction WHERE transaction_id='" + original.transactionId() + "' AND transaction_status='posted'")).isEqualTo(1);
         assertThat(count("SELECT count(*) FROM transaction WHERE related_transaction_id='" + original.transactionId() + "' AND managed_posting AND transaction_status='posted'")).isEqualTo(1);
@@ -163,14 +163,14 @@ class LedgerAtomicRuntimeIT {
         String constraint = "synthetic_" + UUID.randomUUID().toString().replace("-", "");
         sql("ALTER TABLE transaction_leg ADD CONSTRAINT " + constraint + " CHECK(account_id<>'" + entries.get(1).accountId() + "')");
         try {
-            assertThatThrownBy(() -> new SdkLedgerAdapter(baseUrl()).post(key, entries)).isInstanceOf(PaymentFlowException.class);
+            assertThatThrownBy(() -> new SdkLedgerAdapterImpl(baseUrl()).post(key, entries)).isInstanceOf(PaymentFlowException.class);
             assertThat(count("SELECT count(*) FROM transaction WHERE external_reference='" + key + "'")).isZero();
             assertThat(count("SELECT count(*) FROM ledger_posting_request WHERE idempotency_key='" + key + "'")).isZero();
             assertThat(count("SELECT count(*) FROM transaction_leg WHERE account_id='" + entries.getFirst().accountId() + "'")).isZero();
         } finally {
             sql("ALTER TABLE transaction_leg DROP CONSTRAINT " + constraint);
         }
-        assertMoney(entries, new SdkLedgerAdapter(baseUrl()).post(key, entries).legs());
+        assertMoney(entries, new SdkLedgerAdapterImpl(baseUrl()).post(key, entries).legs());
     }
 
     private static List<LedgerLeg> pair(BigDecimal amount) {

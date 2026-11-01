@@ -19,15 +19,15 @@ package io.fireflysoftware.domain.payments.core.sandbox;
 import io.fireflysoftware.domain.payments.MasterData;
 import io.fireflysoftware.domain.payments.core.ports.PaymentMasterPort;
 
-public final class SandboxPaymentMasterAdapter implements PaymentMasterPort {
+public final class SandboxPaymentMasterAdapterImpl implements PaymentMasterPort {
 
     private final MasterData data;
 
-    public SandboxPaymentMasterAdapter() {
+    public SandboxPaymentMasterAdapterImpl() {
         this(SandboxCatalog.masters());
     }
 
-    public SandboxPaymentMasterAdapter(MasterData data) {
+    public SandboxPaymentMasterAdapterImpl(MasterData data) {
         this.data = data;
     }
 

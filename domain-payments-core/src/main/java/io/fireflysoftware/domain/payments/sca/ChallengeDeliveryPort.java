@@ -19,7 +19,7 @@ package io.fireflysoftware.domain.payments.sca;
 import java.util.UUID;
 
 /**
- * Delivers a generated challenge to the caller. {@link SandboxChallengeDeliveryAdapter} is the
+ * Delivers a generated challenge to the caller. {@link SandboxChallengeDeliveryAdapterImpl} is the
  * class an installer replaces with a live SMS, push, or email adapter.
  */
 public interface ChallengeDeliveryPort {

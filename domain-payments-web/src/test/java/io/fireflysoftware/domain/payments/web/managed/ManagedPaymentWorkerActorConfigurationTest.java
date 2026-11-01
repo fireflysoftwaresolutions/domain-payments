@@ -88,7 +88,7 @@ class ManagedPaymentWorkerActorConfigurationTest {
                             assertThat(context).doesNotHaveBean(ManagedPaymentRecoveryWorker.class);
                             assertThat(context)
                                     .doesNotHaveBean(
-                                            ManagedPaymentWorkerWiring.RecoverySchedule.class);
+                                            ManagedPaymentWorkerWiring.RecoveryScheduleImpl.class);
                             assertThat(context)
                                     .doesNotHaveBean(ReactiveOAuth2AuthorizedClientManager.class);
                             assertThat(context)

@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * There is no cancel operation on a payment order: status is INITIATED, COMPLETED, or FAILED.
  * UNMATCHED is stored as FAILED. Lookups stay on the adapter because the domain id is assigned here.
  */
-public final class SdkPaymentRecordAdapter implements PaymentRecordPort {
+public final class SdkPaymentRecordAdapterImpl implements PaymentRecordPort {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
@@ -52,13 +52,13 @@ public final class SdkPaymentRecordAdapter implements PaymentRecordPort {
     private final ConcurrentHashMap<String, UUID> byKey = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, UUID> byReference = new ConcurrentHashMap<>();
 
-    public SdkPaymentRecordAdapter(String baseUrl) {
+    public SdkPaymentRecordAdapterImpl(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
         this(new PaymentOrdersApi(client), new PaymentInstructionsApi(client));
     }
 
-    SdkPaymentRecordAdapter(PaymentOrdersApi orders, PaymentInstructionsApi instructions) {
+    SdkPaymentRecordAdapterImpl(PaymentOrdersApi orders, PaymentInstructionsApi instructions) {
         this.orders = orders;
         this.instructions = instructions;
     }

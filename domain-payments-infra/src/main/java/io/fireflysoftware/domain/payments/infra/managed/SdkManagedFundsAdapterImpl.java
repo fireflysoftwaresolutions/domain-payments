@@ -30,12 +30,12 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
 
-public final class SdkManagedFundsAdapter implements ManagedFundsPort {
+public final class SdkManagedFundsAdapterImpl implements ManagedFundsPort {
     private final PaymentDelegationPort delegation;
     private final String base, audience;
     private final boolean loopback;
 
-    public SdkManagedFundsAdapter(
+    public SdkManagedFundsAdapterImpl(
             PaymentDelegationPort delegation, String base, String audience, boolean loopback) {
         this.delegation = delegation;
         this.base = base;
@@ -46,7 +46,7 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
     Mono<LedgerFundsApi> client(String tenant, View v, Set<String> scopes) {
         return Mono.defer(
                 () -> {
-                    if (!SdkManagedPaymentCoreAdapter.valid(base, loopback))
+                    if (!SdkManagedPaymentCoreAdapterImpl.valid(base, loopback))
                         return Mono.error(fail(503, "CONFIGURED_LEDGER_PARTICIPANT_REQUIRED"));
                     return delegation
                             .token(
@@ -87,7 +87,7 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
     }
 
     public Mono<ReservationObservation> reserve(String t, EffectClaim c) {
-        return SdkManagedPaymentCoreAdapter.safe(
+        return SdkManagedPaymentCoreAdapterImpl.safe(
                 () -> {
                     if (c.kind() != EffectKind.RESERVE
                             || !Objects.equals(c.participantActionId(), c.paymentId()))
@@ -99,7 +99,7 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
     }
 
     public Mono<ReservationObservation> act(String t, EffectClaim c) {
-        return SdkManagedPaymentCoreAdapter.safe(
+        return SdkManagedPaymentCoreAdapterImpl.safe(
                 () -> {
                     if (c.kind() != EffectKind.COMMIT && c.kind() != EffectKind.RELEASE && c.kind() != EffectKind.REVERSE
                             || c.payment().reservationId() == null
@@ -139,7 +139,7 @@ public final class SdkManagedFundsAdapter implements ManagedFundsPort {
     }
 
     public Mono<ReservationObservation> observe(String t, EffectClaim c) {
-        return SdkManagedPaymentCoreAdapter.safe(
+        return SdkManagedPaymentCoreAdapterImpl.safe(
                 () -> {
                     if (c.kind() != EffectKind.OBSERVE) return Mono.error(inconsistent());
                     return reconciliation(t, c.payment())

@@ -29,11 +29,11 @@ import io.fireflysoftware.domain.payments.PaymentFailure;
 import io.fireflysoftware.domain.payments.PaymentFlowException;
 import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapterImpl;
 import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
 import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -65,12 +65,12 @@ class SdkLedgerAdapterHttpTest {
     private static final UUID SPACE = UUID.fromString("10000000-0000-4000-8000-000000000013");
     private static final BigDecimal AMOUNT = new BigDecimal("25.00");
     private LedgerHttpFixture ledger;
-    private SdkLedgerAdapter adapter;
+    private SdkLedgerAdapterImpl adapter;
 
     @BeforeEach
     void start() throws IOException {
         ledger = new LedgerHttpFixture();
-        adapter = new SdkLedgerAdapter(ledger.baseUrl());
+        adapter = new SdkLedgerAdapterImpl(ledger.baseUrl());
     }
 
     @AfterEach
@@ -84,7 +84,7 @@ class SdkLedgerAdapterHttpTest {
         LedgerPosting confirmed = adapter.confirmHold("payment");
         assertEquals(pair(), confirmed.legs());
         assertEquals(hold.transactionId(), confirmed.transactionId());
-        assertEquals(confirmed, new SdkLedgerAdapter(ledger.baseUrl()).confirmHold("payment"));
+        assertEquals(confirmed, new SdkLedgerAdapterImpl(ledger.baseUrl()).confirmHold("payment"));
         assertEquals(1, ledger.statusWrites);
 
         LedgerPosting reversal = adapter.reverse(confirmed, "rejection-compensation");
@@ -93,7 +93,7 @@ class SdkLedgerAdapterHttpTest {
                 new LedgerLeg(CREDIT, null, EntrySide.DEBIT, AMOUNT, "EUR")), reversal.legs());
         assertEquals(hold.transactionId().toString(), ledger.transaction("rejection-compensation").get("relatedTransactionId"));
         assertEquals("REVERSAL", ledger.transaction("rejection-compensation").get("relationType"));
-        LedgerPosting replay = new SdkLedgerAdapter(ledger.baseUrl()).reverse(confirmed, "rejection-compensation");
+        LedgerPosting replay = new SdkLedgerAdapterImpl(ledger.baseUrl()).reverse(confirmed, "rejection-compensation");
         assertEquals(reversal, replay);
         assertEquals(reversal, adapter.findByIdempotencyKey("rejection-compensation").orElseThrow());
         assertEquals(2, ledger.transactionWrites);
@@ -103,10 +103,10 @@ class SdkLedgerAdapterHttpTest {
 
     @Test
     void actualTccProviderRejectionUsesPersistedConfirmedLegs() {
-        SandboxPaymentRailAdapter rail = new SandboxPaymentRailAdapter();
+        SandboxPaymentRailAdapterImpl rail = new SandboxPaymentRailAdapterImpl();
         rail.rejectOutbound("rejected-payment");
-        PaymentTccService hub = PaymentTccServiceImpl.sandbox(adapter, new SandboxPaymentRecordAdapter(), rail,
-                new SandboxPspAdapter(), new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        PaymentTccService hub = PaymentTccServiceImpl.sandbox(adapter, new SandboxPaymentRecordAdapterImpl(), rail,
+                new SandboxPspAdapterImpl(), new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
         MovementCommand command = new MovementCommand(PaymentScheme.INTERNATIONAL_OUTBOUND, "rejected-payment", AMOUNT, "EUR",
                 UUID.fromString("10000000-0000-4000-8000-0000000000aa"),
                 UUID.fromString("10000000-0000-4000-8000-000000000021"), DEBIT, null,
@@ -214,7 +214,7 @@ class SdkLedgerAdapterHttpTest {
     void newWritesUseOneAtomicCommandWithoutLegacyFinancialWrites() {
         LedgerPosting posting = adapter.post("atomic", pair());
         assertEquals(pair(), posting.legs());
-        assertEquals(posting, new SdkLedgerAdapter(ledger.baseUrl()).post("atomic", pair()));
+        assertEquals(posting, new SdkLedgerAdapterImpl(ledger.baseUrl()).post("atomic", pair()));
         assertEquals(0, ledger.legacyWrites);
         assertEquals(2, ledger.atomicCreates);
         assertEquals(1, ledger.transactionWrites);

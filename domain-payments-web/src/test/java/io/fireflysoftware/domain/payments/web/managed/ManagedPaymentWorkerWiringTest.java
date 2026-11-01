@@ -163,7 +163,7 @@ class ManagedPaymentWorkerWiringTest {
         var scheduler = new OrchestrationScheduler(1);
         scheduler.scheduleWithFixedDelay("unrelated", () -> {}, 50000, 50000);
         try {
-            var lifecycle = new ManagedPaymentWorkerWiring.RecoverySchedule(worker, scheduler, 1);
+            var lifecycle = new ManagedPaymentWorkerWiring.RecoveryScheduleImpl(worker, scheduler, 1);
             lifecycle.start();
             long until = System.nanoTime() + Duration.ofSeconds(3).toNanos();
             while (System.nanoTime() < until

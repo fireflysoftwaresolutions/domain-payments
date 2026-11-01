@@ -19,15 +19,15 @@ package io.fireflysoftware.domain.payments.core.sandbox;
 import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.core.ports.PaymentConfigurationPort;
 
-public final class SandboxPaymentConfigurationAdapter implements PaymentConfigurationPort {
+public final class SandboxPaymentConfigurationAdapterImpl implements PaymentConfigurationPort {
 
     private final PaymentsCatalog catalog;
 
-    public SandboxPaymentConfigurationAdapter() {
+    public SandboxPaymentConfigurationAdapterImpl() {
         this(SandboxCatalog.standard());
     }
 
-    public SandboxPaymentConfigurationAdapter(PaymentsCatalog catalog) {
+    public SandboxPaymentConfigurationAdapterImpl(PaymentsCatalog catalog) {
         this.catalog = catalog;
     }
 

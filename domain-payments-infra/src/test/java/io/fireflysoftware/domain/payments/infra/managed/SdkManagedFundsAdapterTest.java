@@ -161,8 +161,8 @@ class SdkManagedFundsAdapterTest {
                     view());
         }
 
-        SdkManagedFundsAdapter adapter(PaymentDelegationPort d) {
-            return new SdkManagedFundsAdapter(
+        SdkManagedFundsAdapterImpl adapter(PaymentDelegationPort d) {
+            return new SdkManagedFundsAdapterImpl(
                     d, "http://127.0.0.1:" + server.getAddress().getPort(), "ledger", true);
         }
 

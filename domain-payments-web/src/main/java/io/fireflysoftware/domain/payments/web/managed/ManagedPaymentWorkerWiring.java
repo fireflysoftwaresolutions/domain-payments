@@ -55,11 +55,11 @@ public class ManagedPaymentWorkerWiring {
 
     @Bean
     @ConditionalOnProperty(name = "managed-payments.recovery.enabled", havingValue = "true")
-    RecoverySchedule managedRecoverySchedule(
+    RecoveryScheduleImpl managedRecoverySchedule(
             ManagedPaymentRecoveryWorker worker,
             OrchestrationScheduler scheduler,
             RecoveryProperties p) {
-        return new RecoverySchedule(worker, scheduler, p.getIntervalSeconds());
+        return new RecoveryScheduleImpl(worker, scheduler, p.getIntervalSeconds());
     }
 
     @ConfigurationProperties("managed-payments.recovery")
@@ -126,9 +126,9 @@ public class ManagedPaymentWorkerWiring {
         }
     }
 
-    public static final class RecoverySchedule implements SmartLifecycle {
+    public static final class RecoveryScheduleImpl implements SmartLifecycle {
         private static final org.slf4j.Logger LOG =
-                org.slf4j.LoggerFactory.getLogger(RecoverySchedule.class);
+                org.slf4j.LoggerFactory.getLogger(RecoveryScheduleImpl.class);
         private static final String TASK = "managed-payments:recovery";
         private final ManagedPaymentRecoveryWorker worker;
         private final OrchestrationScheduler scheduler;
@@ -136,7 +136,7 @@ public class ManagedPaymentWorkerWiring {
         private final Set<Disposable.Swap> active = ConcurrentHashMap.newKeySet();
         private volatile boolean running;
 
-        public RecoverySchedule(
+        public RecoveryScheduleImpl(
                 ManagedPaymentRecoveryWorker worker,
                 OrchestrationScheduler scheduler,
                 int interval) {

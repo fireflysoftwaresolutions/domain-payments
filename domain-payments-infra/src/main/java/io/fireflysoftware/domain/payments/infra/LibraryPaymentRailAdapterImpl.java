@@ -44,11 +44,11 @@ import java.util.Map;
  * {@code TransactionType.WIRE_TRANSFER}. Inbound acceptance does not invent a library operation:
  * library-rails has no inbound-credit method. A later return uses {@code requestReturn}.
  */
-public final class LibraryPaymentRailAdapter implements io.fireflysoftware.domain.payments.core.ports.PaymentRailPort {
+public final class LibraryPaymentRailAdapterImpl implements io.fireflysoftware.domain.payments.core.ports.PaymentRailPort {
 
     private final io.fireflysoftware.rails.adapter.ports.PaymentRailPort rails;
 
-    public LibraryPaymentRailAdapter(io.fireflysoftware.rails.adapter.ports.PaymentRailPort rails) {
+    public LibraryPaymentRailAdapterImpl(io.fireflysoftware.rails.adapter.ports.PaymentRailPort rails) {
         this.rails = rails;
     }
 

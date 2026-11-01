@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class SandboxPaymentRecordAdapter implements PaymentRecordPort {
+public final class SandboxPaymentRecordAdapterImpl implements PaymentRecordPort {
 
     private final ConcurrentHashMap<UUID, StoredPayment> byId = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, UUID> byKey = new ConcurrentHashMap<>();

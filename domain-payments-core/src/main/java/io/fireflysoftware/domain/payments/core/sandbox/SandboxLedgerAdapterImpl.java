@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class SandboxLedgerAdapter implements LedgerPort {
+public final class SandboxLedgerAdapterImpl implements LedgerPort {
 
     private final ConcurrentHashMap<String, LedgerPosting> byKey = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, LedgerPosting> holds = new ConcurrentHashMap<>();

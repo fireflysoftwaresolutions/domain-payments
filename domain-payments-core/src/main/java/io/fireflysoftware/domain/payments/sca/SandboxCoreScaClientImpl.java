@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * No-socket stand-in for core-common-sca-mgmt. An installer replaces this class with
- * {@link SdkCoreScaClient}. It is not used when the live client is selected.
+ * {@link SdkCoreScaClientImpl}. It is not used when the live client is selected.
  */
-public final class SandboxCoreScaClient implements CoreScaClient {
+public final class SandboxCoreScaClientImpl implements CoreScaClient {
 
     private final SecureRandom random = new SecureRandom();
     private final ConcurrentHashMap<UUID, String> codes = new ConcurrentHashMap<>();

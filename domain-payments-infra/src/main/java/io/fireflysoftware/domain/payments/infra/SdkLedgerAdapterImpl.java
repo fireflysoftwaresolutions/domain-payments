@@ -55,7 +55,7 @@ import java.util.UUID;
  * Incomplete or inconsistent persisted postings fail with {@code UNBALANCED_POSTING} before confirmation
  * or reversal writes; transport failures use {@code RECORD_FAILED}.
  */
-public final class SdkLedgerAdapter implements LedgerPort {
+public final class SdkLedgerAdapterImpl implements LedgerPort {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
     private static final int LEG_PAGE_SIZE = 100;
@@ -65,17 +65,17 @@ public final class SdkLedgerAdapter implements LedgerPort {
     private final TransactionLegsApi legsApi;
     private final LedgerPostingsApi postings;
 
-    public SdkLedgerAdapter(String baseUrl) {
+    public SdkLedgerAdapterImpl(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
         this(new TransactionsApi(client), new TransactionLegsApi(client));
     }
 
-    public SdkLedgerAdapter(TransactionsApi transactions, TransactionLegsApi legsApi) {
+    public SdkLedgerAdapterImpl(TransactionsApi transactions, TransactionLegsApi legsApi) {
         this(transactions, legsApi, new LedgerPostingsApi(transactions.getApiClient()));
     }
 
-    public SdkLedgerAdapter(TransactionsApi transactions, TransactionLegsApi legsApi, LedgerPostingsApi postings) {
+    public SdkLedgerAdapterImpl(TransactionsApi transactions, TransactionLegsApi legsApi, LedgerPostingsApi postings) {
         this.transactions = transactions;
         this.legsApi = legsApi;
         this.postings = postings;

@@ -22,12 +22,12 @@ import io.fireflysoftware.domain.payments.PaymentPhase;
 import io.fireflysoftware.domain.payments.PaymentScheme;
 import io.fireflysoftware.domain.payments.core.tcc.PaymentTccService;
 import io.fireflysoftware.domain.payments.core.tcc.impl.PaymentTccServiceImpl;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapter;
-import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapter;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxLedgerAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentConfigurationAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentMasterAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRailAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPaymentRecordAdapterImpl;
+import io.fireflysoftware.domain.payments.core.sandbox.SandboxPspAdapterImpl;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -42,9 +42,9 @@ class PaymentsControllerTest {
 
     @Test
     void tryThenConfirmUsesTheGeneratedChallenge() {
-        PaymentTccService hub = PaymentTccServiceImpl.sandbox(new SandboxLedgerAdapter(),
-                new SandboxPaymentRecordAdapter(), new SandboxPaymentRailAdapter(), new SandboxPspAdapter(),
-                new SandboxPaymentConfigurationAdapter(), new SandboxPaymentMasterAdapter());
+        PaymentTccService hub = PaymentTccServiceImpl.sandbox(new SandboxLedgerAdapterImpl(),
+                new SandboxPaymentRecordAdapterImpl(), new SandboxPaymentRailAdapterImpl(), new SandboxPspAdapterImpl(),
+                new SandboxPaymentConfigurationAdapterImpl(), new SandboxPaymentMasterAdapterImpl());
         PaymentsController controller = new PaymentsController(hub);
         UUID party = UUID.fromString("10000000-0000-4000-8000-0000000000aa");
         UUID contract = UUID.fromString("10000000-0000-4000-8000-000000000021");

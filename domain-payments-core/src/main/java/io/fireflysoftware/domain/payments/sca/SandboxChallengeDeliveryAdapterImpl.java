@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * It does not send SMS, push, or email, and it does not open a socket.
  * An installer replaces this class with a live delivery adapter.
  */
-public final class SandboxChallengeDeliveryAdapter implements ChallengeDeliveryPort {
+public final class SandboxChallengeDeliveryAdapterImpl implements ChallengeDeliveryPort {
 
     private final ConcurrentHashMap<UUID, String> inbox = new ConcurrentHashMap<>();
 

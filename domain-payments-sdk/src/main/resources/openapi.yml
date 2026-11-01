@@ -11,7 +11,7 @@ info:
     url: https://www.apache.org/licenses/LICENSE-2.0
   version: 1.0.0
 servers:
-- url: http://localhost:58577
+- url: http://localhost:47011
   description: Local Development Server
 tags:
 - name: Payments

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class SandboxAccountPositionAdapter implements AccountPositionPort {
+public final class SandboxAccountPositionAdapterImpl implements AccountPositionPort {
 
     private final ConcurrentHashMap<String, PositionMovement> applied = new ConcurrentHashMap<>();
     private final AtomicInteger failCredits = new AtomicInteger();

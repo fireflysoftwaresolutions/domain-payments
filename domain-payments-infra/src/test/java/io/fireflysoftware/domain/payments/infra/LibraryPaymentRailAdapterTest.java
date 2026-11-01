@@ -45,7 +45,7 @@ class LibraryPaymentRailAdapterTest {
         AtomicReference<InitiatePaymentRequest> initiated = new AtomicReference<>();
         AtomicReference<ReturnRequest> returned = new AtomicReference<>();
         io.fireflysoftware.rails.adapter.ports.PaymentRailPort rails = proxy(initiated, returned);
-        LibraryPaymentRailAdapter adapter = new LibraryPaymentRailAdapter(rails);
+        LibraryPaymentRailAdapterImpl adapter = new LibraryPaymentRailAdapterImpl(rails);
         SyncResult result = adapter.sendOutbound(new OutboundInstruction("wire-1", new BigDecimal("40.00"), "EUR",
                 UUID.fromString("10000000-0000-4000-8000-000000000011"), "Ada", "Beneficiary",
                 "DE89370400440532013000", "COBADEFFXXX", RailKind.SWIFT, null,
@@ -63,7 +63,7 @@ class LibraryPaymentRailAdapterTest {
     @Test
     void domesticCreditTransferDoesNotUseTheWireOperation() {
         AtomicReference<InitiatePaymentRequest> initiated = new AtomicReference<>();
-        LibraryPaymentRailAdapter adapter = new LibraryPaymentRailAdapter(proxy(initiated, new AtomicReference<>()));
+        LibraryPaymentRailAdapterImpl adapter = new LibraryPaymentRailAdapterImpl(proxy(initiated, new AtomicReference<>()));
         adapter.sendOutbound(new OutboundInstruction("sepa-1", new BigDecimal("10.00"), "EUR",
                 UUID.fromString("10000000-0000-4000-8000-000000000011"), "Ada", "Beneficiary",
                 "DE89370400440532013000", "COBADEFFXXX", RailKind.SEPA, null, null));

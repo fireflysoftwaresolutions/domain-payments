@@ -46,7 +46,7 @@ import java.util.UUID;
 /**
  * Reads the payments catalog from core-common-config-mgmt channel parameter {@code payments.catalog}.
  */
-public final class SdkPaymentConfigurationAdapter implements PaymentConfigurationPort {
+public final class SdkPaymentConfigurationAdapterImpl implements PaymentConfigurationPort {
 
     static final String PARAMETER_KEY = "payments.catalog";
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
@@ -54,13 +54,13 @@ public final class SdkPaymentConfigurationAdapter implements PaymentConfiguratio
     private final ChannelConfigParametersApi parameters;
     private final ObjectMapper json = new ObjectMapper();
 
-    public SdkPaymentConfigurationAdapter(String baseUrl) {
+    public SdkPaymentConfigurationAdapterImpl(String baseUrl) {
         ApiClient client = new ApiClient();
         client.setBasePath(strip(baseUrl));
         this(new ChannelConfigParametersApi(client));
     }
 
-    SdkPaymentConfigurationAdapter(ChannelConfigParametersApi parameters) {
+    SdkPaymentConfigurationAdapterImpl(ChannelConfigParametersApi parameters) {
         this.parameters = parameters;
     }
 

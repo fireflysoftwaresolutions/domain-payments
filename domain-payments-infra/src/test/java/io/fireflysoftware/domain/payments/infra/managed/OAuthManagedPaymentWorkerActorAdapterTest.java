@@ -150,7 +150,7 @@ class OAuthManagedPaymentWorkerActorAdapterTest {
                     .build();
         }
 
-        OAuthManagedPaymentWorkerActorAdapter adapter() {
+        OAuthManagedPaymentWorkerActorAdapterImpl adapter() {
             var registrations =
                     new InMemoryReactiveClientRegistrationRepository(
                             registration("owned-worker", "worker-owned"));
@@ -159,7 +159,7 @@ class OAuthManagedPaymentWorkerActorAdapterTest {
             var manager = config.fireflyAuthorizedClientManager(registrations, service);
             var decoder = NimbusReactiveJwtDecoder.withJwkSetUri(base() + "/jwks").build();
             decoder.setJwtValidator(AccessTokenValidators.forIssuerAndAudience(ISSUER, "domain"));
-            return new OAuthManagedPaymentWorkerActorAdapter(
+            return new OAuthManagedPaymentWorkerActorAdapterImpl(
                     manager, registrations, decoder, Map.of("owned", "owned-worker"), true);
         }
 
@@ -233,7 +233,7 @@ class OAuthManagedPaymentWorkerActorAdapterTest {
                             repository, config.fireflyAuthorizedClientService(repository));
             assertThatThrownBy(
                             () ->
-                                    new OAuthManagedPaymentWorkerActorAdapter(
+                                    new OAuthManagedPaymentWorkerActorAdapterImpl(
                                             manager,
                                             repository,
                                             t ->

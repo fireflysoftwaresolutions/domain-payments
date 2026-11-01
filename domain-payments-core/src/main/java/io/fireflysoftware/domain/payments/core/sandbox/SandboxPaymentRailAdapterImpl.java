@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class SandboxPaymentRailAdapter implements PaymentRailPort {
+public final class SandboxPaymentRailAdapterImpl implements PaymentRailPort {
 
     private final Set<String> rejectOutbound = ConcurrentHashMap.newKeySet();
     private final AtomicInteger outboundCalls = new AtomicInteger();

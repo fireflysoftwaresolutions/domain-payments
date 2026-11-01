@@ -1,7 +1,7 @@
 package io.fireflysoftware.domain.payments.web;
 
 import io.fireflysoftware.domain.payments.sca.ChallengeDeliveryPort;
-import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
+import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapterImpl;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.env.YamlPropertySourceLoader;
@@ -67,13 +67,13 @@ class PaymentsWiringTest {
 
     @Test
     void liveRejectsBuiltInSandboxDelivery() {
-        live().withBean(ChallengeDeliveryPort.class, SandboxChallengeDeliveryAdapter::new)
+        live().withBean(ChallengeDeliveryPort.class, SandboxChallengeDeliveryAdapterImpl::new)
                 .run(context -> assertThat(context).hasFailed());
     }
 
     @Test
     void liveRejectsAopProxyAroundBuiltInSandboxDelivery() {
-        ProxyFactory proxy = new ProxyFactory(new SandboxChallengeDeliveryAdapter());
+        ProxyFactory proxy = new ProxyFactory(new SandboxChallengeDeliveryAdapterImpl());
         proxy.setInterfaces(ChallengeDeliveryPort.class);
         live().withBean(ChallengeDeliveryPort.class, () -> (ChallengeDeliveryPort) proxy.getProxy())
                 .run(context -> assertThat(context).hasFailed());

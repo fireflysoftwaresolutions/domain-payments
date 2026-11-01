@@ -32,7 +32,7 @@ public class ManagedPaymentsWiring {
     @ConditionalOnMissingBean(PaymentDelegationPort.class)
     PaymentDelegationPort managedPaymentDelegation(
             @Value("${managed-payments.delegation.mode:unconfigured}") String mode) {
-        return new ManagedPaymentDelegationAdapter(mode);
+        return new ManagedPaymentDelegationAdapterImpl(mode);
     }
 
     @Bean
@@ -42,7 +42,7 @@ public class ManagedPaymentsWiring {
             @Value("${managed-payments.peers.payment-core.base-url:}") String url,
             @Value("${managed-payments.peers.payment-core.audience:}") String audience,
             @Value("${managed-payments.allow-loopback-http:false}") boolean loopback) {
-        return new SdkManagedPaymentCoreAdapter(delegation, url, audience, loopback);
+        return new SdkManagedPaymentCoreAdapterImpl(delegation, url, audience, loopback);
     }
 
     @Bean
@@ -52,7 +52,7 @@ public class ManagedPaymentsWiring {
             @Value("${managed-payments.peers.ledger.base-url:}") String url,
             @Value("${managed-payments.peers.ledger.audience:}") String audience,
             @Value("${managed-payments.allow-loopback-http:false}") boolean loopback) {
-        return new SdkManagedFundsAdapter(delegation, url, audience, loopback);
+        return new SdkManagedFundsAdapterImpl(delegation, url, audience, loopback);
     }
 
     @Bean

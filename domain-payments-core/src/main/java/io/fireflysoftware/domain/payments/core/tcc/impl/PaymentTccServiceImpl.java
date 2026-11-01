@@ -34,8 +34,8 @@ import io.fireflysoftware.domain.payments.PaymentsCatalog;
 import io.fireflysoftware.domain.payments.PaymentsCatalog.SchemeRouting;
 import io.fireflysoftware.domain.payments.StoredPayment;
 import io.fireflysoftware.domain.payments.sca.ChallengeStatus;
-import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapter;
-import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClient;
+import io.fireflysoftware.domain.payments.sca.SandboxChallengeDeliveryAdapterImpl;
+import io.fireflysoftware.domain.payments.sca.SandboxCoreScaClientImpl;
 import io.fireflysoftware.domain.payments.sca.ScaChallengeService;
 import io.fireflysoftware.domain.payments.sca.impl.ScaChallengeServiceImpl;
 import io.fireflysoftware.domain.payments.SyncMessages.InboundInstruction;
@@ -133,7 +133,7 @@ public final class PaymentTccServiceImpl implements PaymentTccService {
                                         PaymentConfigurationPort configuration,
                                         PaymentMasterPort masters) {
         return create(ledger, records, rail, psp, configuration, masters,
-                new ScaChallengeServiceImpl(new SandboxCoreScaClient(), new SandboxChallengeDeliveryAdapter()));
+                new ScaChallengeServiceImpl(new SandboxCoreScaClientImpl(), new SandboxChallengeDeliveryAdapterImpl()));
     }
 
     public MovementResult tryPayment(MovementCommand command) {
